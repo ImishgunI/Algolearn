@@ -30,3 +30,5 @@ go.work.sum
 # Editor/IDE
 .idea/
 # .vscode/
+AlgoLearn/bruno.json
+AlgoLearn/Register.bru
