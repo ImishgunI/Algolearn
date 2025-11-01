@@ -9,17 +9,14 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
         });
 
         if (response.ok) {
             const data = await response.json();
-
-            // Сохраняем, что пользователь вошёл
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('user_role', data.role || 'Студент');
-            localStorage.setItem('user_email', data.email || 'user@example.com');
-
             alert('Вход успешен!');
             window.location.href = 'dashboard.html';
         } else {
