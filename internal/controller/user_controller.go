@@ -15,14 +15,21 @@ type Handler struct {
 }
 
 type RegisterRequest struct {
-	Name     string `json:"name"`
-	LastName string `json:"lastName"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Password  string `json:"passwordHash"`
 }
 
 func NewHandler(db *database.Database) *Handler {
 	return &Handler{Db: db}
+}
+
+func CloseBody(r *http.Request) {
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func (h *Handler) RegisterController(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +38,7 @@ func (h *Handler) RegisterController(w http.ResponseWriter, r *http.Request) {
 		log.Println("Method Not Allowed")
 		return
 	}
-	defer r.Body.Close()
+	defer CloseBody(r)
 	user := models.NewUser()
 	req := &RegisterRequest{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -39,16 +46,24 @@ func (h *Handler) RegisterController(w http.ResponseWriter, r *http.Request) {
 		log.Println("Status Bad Request")
 		return
 	}
+	log.Println(req)
 	hashed, err := services.HashPassword(req.Password)
 	if err != nil {
 		log.Println(err)
 	}
-	user.Name = req.Name
+	user.FirstName = req.FirstName
 	user.LastName = req.LastName
 	user.Email = req.Email
 	user.PasswordHash = hashed
 	user.Role = "student"
-	err = user.Register(context.Background(), h.Db)
+	log.Println(user)
+	ok, err := h.Db.UniqueEmail(context.Background(), user.Email)
+	if err != nil || !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	err = h.Db.Register(context.Background(), user)
 	if err != nil {
 		log.Println("Failed to register user:", err)
 		http.Error(w, "Registration failed", http.StatusUnauthorized)
@@ -64,7 +79,7 @@ func (h *Handler) LoginController(w http.ResponseWriter, r *http.Request) {
 		log.Println("Method Not Allowed")
 		return
 	}
-	defer r.Body.Close()
+	defer CloseBody(r)
 	var req struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -77,12 +92,18 @@ func (h *Handler) LoginController(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Email = req.Email
 	user.PasswordHash = req.Password
-	ok, err := user.Login(context.Background(), h.Db)
+	ok, err := h.Db.Login(context.Background(), user)
 	if err != nil || !ok {
 		log.Println("Failed to login user:", err)
 		http.Error(w, "Login failed", http.StatusUnauthorized)
 		return
 	}
-	log.Println("User Login Success")
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		return
+	}
+	log.Println("User Login Success")
 }
