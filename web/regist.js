@@ -16,7 +16,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                name: firstName,
+                firstName: firstName,
                 lastName: lastName,
                 email: email,
                 passwordHash: password,
