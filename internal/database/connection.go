@@ -10,7 +10,7 @@ import (
 )
 
 type Database struct {
-	Db *pgx.Conn
+	db *pgx.Conn
 }
 
 func Connect(ctx context.Context, config config.DBConfig) *Database {
@@ -21,12 +21,12 @@ func Connect(ctx context.Context, config config.DBConfig) *Database {
 	}
 	log.Println("Successfully connected to database")
 	return &Database{
-		Db: conn,
+		db: conn,
 	}
 }
 
 func Close(ctx context.Context, conn *Database) {
-	err := conn.Db.Close(ctx)
+	err := conn.db.Close(ctx)
 	if err != nil {
 		log.Println(err)
 	}
