@@ -13,12 +13,11 @@ import (
 )
 
 func main() {
-	DbConf := config.DbConfig()
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	db := database.Connect(ctx, *DbConf)
+	db := database.Connect(ctx)
 	defer cancel()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:63342"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://127.0.0.1:3000"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
@@ -28,10 +27,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register", h.RegisterController)
 	mux.HandleFunc("/login", h.LoginController)
-	cfg := config.Config()
 	log.Println("Connecting to localhost")
 	handler := c.Handler(mux)
-	if err := http.ListenAndServe(cfg.Port, handler); err != nil {
+	if err := http.ListenAndServe(":"+config.GetString("PORT"), handler); err != nil {
 		log.Fatal(err)
 	}
 	defer database.Close(ctx, db)
