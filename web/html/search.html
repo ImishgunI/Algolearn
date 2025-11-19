@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Поиск — AlgoLearn</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/courses.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body>
+        <header class="header">
+            <div class="container">
+                <nav class="nav">
+                    <div class="logo"><h2>AlgoLearn</h2></div>
+                    <ul class="nav-menu">
+                        <li><a href="index.html">Главная</a></li>
+                    </ul>
+                    <div class="auth-buttons" id="authButtons"></div>
+                </nav>
+            </div>
+        </header>
+
+        <main
+            class="container"
+            style="margin-top: 100px; display: flex; gap: 25px"
+        >
+            <aside class="sidebar">
+                <h3>Алгоритмы поиска</h3>
+                <ul>
+                    <li><a href="#linear">Линейный</a></li>
+                    <li><a href="#binary">Бинарный</a></li>
+                </ul>
+            </aside>
+
+            <section id="content" class="content">
+                <p>Выберите алгоритм.</p>
+            </section>
+        </main>
+
+        <script src="../js/app.js"></script>
+        <script src="../js/courses.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                updateAuthButtons();
+                loadPage();
+
+                document.querySelectorAll(".sidebar a").forEach((link) => {
+                    link.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        history.pushState(null, null, link.href);
+                        loadPage();
+                    });
+                });
+
+                window.addEventListener("hashchange", loadPage);
+            });
+        </script>
+    </body>
+</html>

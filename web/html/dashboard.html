@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Личный кабинет — AlgoLearn</title>
+        <style>
+            body {
+                font-family: "Gilroy", sans-serif;
+                background-color: #f2f2f2;
+                color: #000000;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+            .card {
+                background: #ffffff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+            .card h1 {
+                font-size: 28px;
+                margin-bottom: 20px;
+                color: #0078d7;
+            }
+            .info {
+                margin: 15px 0;
+                font-size: 18px;
+            }
+            .info strong {
+                color: #0078d7;
+            }
+            .btn {
+                display: inline-block;
+                margin: 10px;
+                padding: 12px 24px;
+                background-color: #0078d7;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+                font-weight: bold;
+                transition: background 0.3s;
+                cursor: pointer;
+                border: none;
+            }
+            .btn:hover {
+                background-color: #005fa3;
+            }
+            .btn.logout {
+                background-color: #dc3545;
+            }
+            .btn.logout:hover {
+                background-color: #c82333;
+            }
+            .meta {
+                margin-top: 12px;
+                font-size: 14px;
+                color: #444;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="card">
+                <h1>Личный кабинет</h1>
+                <div class="info">
+                    <p>
+                        Вы вошли как:
+                        <strong id="displayName">Имя Фамилия</strong>
+                    </p>
+                    <p class="meta">Роль: <strong id="role">-</strong></p>
+                </div>
+
+                <div>
+                    <a href="index.html" class="btn" id="toMain">На главную</a>
+                    <button class="btn logout" id="logoutBtn">Выйти</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const firstName = localStorage.getItem("user_firstName") || "";
+            const lastName = localStorage.getItem("user_lastName") || "";
+            const role = localStorage.getItem("user_role") || "Студент";
+
+            const fallbackEmail = localStorage.getItem("user_email") || "";
+
+            let displayName = "";
+            if (firstName || lastName) {
+                displayName = (firstName + " " + lastName).trim();
+            } else if (fallbackEmail) {
+                displayName = fallbackEmail;
+            } else {
+                displayName = "Гость";
+            }
+
+            document.getElementById("displayName").textContent = displayName;
+            document.getElementById("role").textContent = role;
+
+            document
+                .getElementById("logoutBtn")
+                .addEventListener("click", function () {
+                    localStorage.removeItem("user_firstName");
+                    localStorage.removeItem("user_lastName");
+                    localStorage.removeItem("user_email");
+                    localStorage.removeItem("user_role");
+                    localStorage.removeItem("token");
+                    window.location.href = "login.html";
+                });
+
+            document
+                .getElementById("toMain")
+                .addEventListener("click", function (e) {});
+        </script>
+    </body>
+</html>
