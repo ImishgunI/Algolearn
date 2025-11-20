@@ -17,9 +17,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - algonet
 
   backend:
-    image: alpine:latest
+    image: debian:slim
     depends_on:
       db:
         condition: service_healthy
@@ -32,6 +34,8 @@ services:
     environment:
       POSTGRES_URL: postgresql://postgres:postgres@db:5432/algolearn?sslmode=disable
       PORT: 8080
+    networks:
+      - algonet
 
   frontend:
     image: nginx:latest
@@ -47,6 +51,12 @@ services:
     ports:
       - "3000:80"
     restart: always
+    networks:
+      - algonet
 
 volumes:
   pg_data:
+
+networks:
+  algonet:
+    driver: bridge
