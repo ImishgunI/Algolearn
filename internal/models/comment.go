@@ -14,3 +14,10 @@ type CommentRequest struct {
 	LessonTitle string `json:"lesson_title"`
 	Content     string `json:"content" db:"content"`
 }
+
+type CommentResponse struct {
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+}
