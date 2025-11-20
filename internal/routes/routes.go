@@ -15,4 +15,5 @@ func SetRoutes(r *gin.Engine, db *database.Database) {
 	r.POST("/login", h.LoginController)
 	r.POST("/newComment", hc.AddComment)
 	r.GET("/lessons", hl.GetLessons)
+	r.GET("/comments/", hc.GetComments)
 }
