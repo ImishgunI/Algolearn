@@ -5,7 +5,7 @@ import (
 	"algolearn/internal/models"
 	"log"
 	"net/http"
-	"strings"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,15 +39,22 @@ func (h *CommentHandler) AddComment(c *gin.Context) {
 
 func (h *CommentHandler) GetComments(c *gin.Context) {
 	title := c.Query("lesson_title")
-	code := strings.Compare(title, "")
-	if code != 0 {
+	if title == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid query",
 		})
 		return
 	}
-	var comments []models.Comment
-	comments, err := h.db.GetComments(c.Request.Context(), title)
+	decodedTitle, err := url.QueryUnescape(title)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	var comments []models.CommentResponse
+	comments, err = h.db.GetComments(c.Request.Context(), decodedTitle)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
