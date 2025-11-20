@@ -295,6 +295,20 @@ function displayComments(comments) {
     `).join('');
 }
 
+async function loadComments(lessonTitle) {
+    try {
+        const response = await fetch(`http://localhost:8080/comments?lesson_title=${lessonTitle}`);
+        if (response.ok) {
+            const data = await response.json();
+            displayComments(data.comments);
+        } else {
+            console.error('Ошибка загрузки комментариев');
+        }
+    } catch (err) {
+        console.error('Ошибка сети при загрузке комментариев', err);
+    }
+}
+
 async function loadPage() {
     console.log('=== START loadPage ===');
     
@@ -368,7 +382,7 @@ async function loadPage() {
         addComment(topic.name);
     });
 
-    displayComments([]);
+    await loadComments(topic.name);
     
     hljs.highlightAll();
     markActiveLink(topicKey);
