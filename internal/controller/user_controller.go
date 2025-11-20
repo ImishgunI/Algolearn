@@ -4,10 +4,10 @@ import (
 	"algolearn/internal/database"
 	"algolearn/internal/models"
 	"algolearn/internal/services"
-	"context"
-	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -21,89 +21,75 @@ type RegisterRequest struct {
 	Password  string `json:"passwordHash"`
 }
 
-func NewHandler(db *database.Database) *Handler {
+func NewUserHandler(db *database.Database) *Handler {
 	return &Handler{Db: db}
 }
 
-func CloseBody(r *http.Request) {
-	if err := r.Body.Close(); err != nil {
-		log.Println(err)
-		return
-	}
-}
-
-func (h *Handler) RegisterController(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		log.Println("Method Not Allowed")
-		return
-	}
-	defer CloseBody(r)
+func (h *Handler) RegisterController(c *gin.Context) {
 	user := models.NewUser()
 	req := &RegisterRequest{}
-	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println("Status Bad Request")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    "bad request",
+			"message": err.Error(),
+		})
 		return
 	}
-	log.Println(req)
 	hashed, err := services.HashPassword(req.Password)
 	if err != nil {
 		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    "StatusInternalServerError",
+			"message": "Failed to hash password",
+		})
+		return
 	}
 	user.FirstName = req.FirstName
 	user.LastName = req.LastName
 	user.Email = req.Email
 	user.PasswordHash = hashed
 	user.Role = "student"
-	log.Println(user)
-	ok, err := h.Db.UniqueEmail(context.Background(), user.Email)
-	if err != nil || !ok {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-	err = h.Db.Register(context.Background(), user)
+	err = h.Db.Register(c.Request.Context(), user)
 	if err != nil {
 		log.Println("Failed to register user:", err)
-		http.Error(w, "Registration failed", http.StatusUnauthorized)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    "StatusInternalServerError",
+			"message": "Failed to register user",
+		})
 		return
 	}
 	log.Println("User Register Success")
-	w.WriteHeader(http.StatusCreated)
+	c.Status(http.StatusCreated)
 }
 
-func (h *Handler) LoginController(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		log.Println("Method Not Allowed")
-		return
-	}
-	defer CloseBody(r)
+func (h *Handler) LoginController(c *gin.Context) {
 	var req struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 	user := models.NewUser()
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println("Status Bad Request")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    "bad request",
+			"message": err.Error(),
+		})
 		return
 	}
 	user.Email = req.Email
 	user.PasswordHash = req.Password
-	ok, err := h.Db.Login(context.Background(), user)
-	if err != nil || !ok {
+	user, err := h.Db.Login(c.Request.Context(), user)
+	if err != nil {
 		log.Println("Failed to login user:", err)
-		http.Error(w, "Login failed", http.StatusUnauthorized)
-		return
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    "StatusInternalServerError",
+			"message": err.Error(),
+		})
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println(err)
-		return
-	}
+	c.JSON(http.StatusOK, gin.H{
+		"first_name": user.FirstName,
+		"last_name":  user.LastName,
+		"email":      user.Email,
+		"role":       user.Role,
+	})
 	log.Println("User Login Success")
 }
