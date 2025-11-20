@@ -50,13 +50,12 @@ async function loadLessonsData() {
 function transformLessonsData(lessons) {
     const topics = {};
     
-    // Сначала создаем структуру из mapping'а
     for (const [category, lessonsMap] of Object.entries(topicMapping)) {
         topics[category] = {};
         for (const [key, title] of Object.entries(lessonsMap)) {
             topics[category][key] = {
                 name: title,
-                theory: '', // временно пусто
+                theory: '', 
                 code: getDefaultCode(title),
                 data: getDefaultData(title),
                 test: getDefaultTest(title),
@@ -65,17 +64,15 @@ function transformLessonsData(lessons) {
         }
     }
     
-    // Затем наполняем данными из БД
     lessons.forEach(lesson => {
         const category = lesson.category;
         
-        // Ищем урок в mapping'е по названию
+
         if (topics[category]) {
             for (const [key, topic] of Object.entries(topics[category])) {
                 if (topic.name === lesson.title) {
-                    // Обновляем теорию из БД
                     topic.theory = lesson.content;
-                    topic.lesson_id = lesson.id; // если есть id
+                    topic.lesson_id = lesson.id; 
                     console.log(`Updated topic: ${topic.name} in category ${category}`);
                     break;
                 }
@@ -257,7 +254,7 @@ async function addComment(name) {
     try {
         const response = await fetch("http://localhost:8080/newComment", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 email: email,
                 lesson_title: name,   
@@ -267,8 +264,7 @@ async function addComment(name) {
 
         if (response.ok) {
             document.getElementById("new-comment").value = "";
-            const comments = await response.json();
-            displayComments(comments);
+            loadComments(name)
             alert("Комментарий успешно добавлен");
         } else {
             const error = await response.text();
@@ -279,6 +275,18 @@ async function addComment(name) {
     }
 }
 
+function formatDateReadable(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
 function displayComments(comments) {
     const commentList = document.getElementById("comment-list");
     
@@ -286,10 +294,11 @@ function displayComments(comments) {
         commentList.innerHTML = "<p>Пока нет комментариев. Будьте первым!</p>";
         return;
     }
-
+    console.log(comments.created_at)
     commentList.innerHTML = comments.map(comment => `
         <div class="comment">
-            <span class="date">${new Date(comment.created_at).toLocaleString()}</span>
+            <strong class="comment-author">${comment.first_name} ${comment.last_name}</strong>
+            <span class="date">${formatDateReadable(comment.created_at)}</span>
             <p>${comment.content}</p>
         </div>
     `).join('');
@@ -297,7 +306,7 @@ function displayComments(comments) {
 
 async function loadComments(lessonTitle) {
     try {
-        const response = await fetch(`http://localhost:8080/comments?lesson_title=${lessonTitle}`);
+        const response = await fetch(`http://localhost:8080/comments?lesson_title=${encodeURIComponent(lessonTitle)}`);
         if (response.ok) {
             const data = await response.json();
             displayComments(data.comments);
@@ -369,11 +378,11 @@ async function loadPage() {
 
         <div class="comments">
             <h3>Комментарии</h3>
-            <div id="comment-list"></div>
             <form id="comment-form">
                 <textarea id="new-comment" placeholder="Поделись мыслями..." required></textarea>
                 <button type="submit">Отправить</button>
             </form>
+            <div id="comment-list"></div>
         </div>
     `;
 
