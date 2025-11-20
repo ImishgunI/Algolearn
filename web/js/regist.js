@@ -14,7 +14,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     try {
         const response = await fetch('http://localhost:8080/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 firstName: firstName,
                 lastName: lastName,
