@@ -5,6 +5,7 @@ import (
 	"algolearn/internal/models"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,17 +27,34 @@ func (h *CommentHandler) AddComment(c *gin.Context) {
 		})
 		return
 	}
-	comment := &models.Comment{}
-	comment, err := h.db.AddComment(c.Request.Context(), &req)
+	err := h.db.AddComment(c.Request.Context(), &req)
 	if err != nil {
-		log.Println("ID not found in users or lessons")
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to add comment",
 		})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{
-		"content":    comment.Content,
-		"created_at": comment.CreatedAt,
+}
+
+func (h *CommentHandler) GetComments(c *gin.Context) {
+	title := c.Query("lesson_title")
+	code := strings.Compare(title, "")
+	if code != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid query",
+		})
+		return
+	}
+	var comments []models.Comment
+	comments, err := h.db.GetComments(c.Request.Context(), title)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to get comments",
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"comments": comments,
 	})
 }
