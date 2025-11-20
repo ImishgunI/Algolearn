@@ -1,4 +1,4 @@
-FROM golang:1.25.3-alpine as builder
+FROM golang:1.25.3 as builder
 
 WORKDIR /app
 
@@ -8,9 +8,9 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main cmd/server/main.go
 
-FROM alpine:latest
+FROM debian:stable-slim
 
 COPY --from=builder /app/main .
 
