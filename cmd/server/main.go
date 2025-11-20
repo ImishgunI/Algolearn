@@ -14,16 +14,16 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	db := database.Connect(ctx)
 	defer cancel()
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "http://127.0.0.1:3000"},
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
-		Debug:            true,
 	})
 	routes.SetRoutes(r, db)
 	log.Println("Connecting to localhost")
