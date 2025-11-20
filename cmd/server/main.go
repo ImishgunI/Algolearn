@@ -2,17 +2,19 @@ package main
 
 import (
 	"algolearn/internal/config"
-	"algolearn/internal/controller"
 	"algolearn/internal/database"
+	"algolearn/internal/routes"
 	"context"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 )
 
 func main() {
+	r := gin.Default()
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	db := database.Connect(ctx)
 	defer cancel()
@@ -23,12 +25,9 @@ func main() {
 		AllowCredentials: true,
 		Debug:            true,
 	})
-	h := controller.NewHandler(db)
-	mux := http.NewServeMux()
-	mux.HandleFunc("/register", h.RegisterController)
-	mux.HandleFunc("/login", h.LoginController)
+	routes.SetRoutes(r, db)
 	log.Println("Connecting to localhost")
-	handler := c.Handler(mux)
+	handler := c.Handler(r)
 	if err := http.ListenAndServe(":"+config.GetString("PORT"), handler); err != nil {
 		log.Fatal(err)
 	}
