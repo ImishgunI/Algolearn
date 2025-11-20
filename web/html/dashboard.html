@@ -74,6 +74,9 @@
                         Вы вошли как:
                         <strong id="displayName">Имя Фамилия</strong>
                     </p>
+                    <p class="meta">Почта: 
+                        <strong id="email"></strong>
+                    </p>
                     <p class="meta">Роль: <strong id="role">-</strong></p>
                 </div>
 
@@ -85,31 +88,26 @@
         </div>
 
         <script>
-            const firstName = localStorage.getItem("user_firstName") || "";
-            const lastName = localStorage.getItem("user_lastName") || "";
-            const role = localStorage.getItem("user_role") || "Студент";
+            const firstName = localStorage.getItem("first_name");
+            const lastName = localStorage.getItem("last_name");
+            const role = localStorage.getItem("role");
 
-            const fallbackEmail = localStorage.getItem("user_email") || "";
+            const email = localStorage.getItem("email");
 
-            let displayName = "";
-            if (firstName || lastName) {
-                displayName = (firstName + " " + lastName).trim();
-            } else if (fallbackEmail) {
-                displayName = fallbackEmail;
-            } else {
-                displayName = "Гость";
-            }
+            let displayName = (firstName + " " + lastName);
 
             document.getElementById("displayName").textContent = displayName;
+            document.getElementById("email").textContent = email;
             document.getElementById("role").textContent = role;
 
             document
                 .getElementById("logoutBtn")
                 .addEventListener("click", function () {
-                    localStorage.removeItem("user_firstName");
-                    localStorage.removeItem("user_lastName");
-                    localStorage.removeItem("user_email");
-                    localStorage.removeItem("user_role");
+                    localStorage.setItem("isLoggedIn", false);
+                    localStorage.removeItem("first_name");
+                    localStorage.removeItem("last_name");
+                    localStorage.removeItem("email");
+                    localStorage.removeItem("role");
                     localStorage.removeItem("token");
                     window.location.href = "login.html";
                 });

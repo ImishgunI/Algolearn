@@ -18,8 +18,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (response.ok) {
             const data = await response.json();
             alert('Вход успешен!');
-            localStorage.setItem("isLoggedIn", "true")
-            localStorage.setItem("firstName")
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("first_name", data.first_name);
+            localStorage.setItem("last_name", data.last_name);
+            localStorage.setItem("email", data.email);
+            localStorage.setItem("role", data.role);
             window.location.href = 'dashboard.html';
         } else {
             const error = await response.text();
