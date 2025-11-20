@@ -9,7 +9,7 @@ import (
 
 type CommentRepository interface {
 	AddComment(ctx context.Context, req *models.CommentRequest) error
-	GetComments(ctx context.Context) ([]models.Comment, error)
+	GetComments(ctx context.Context) ([]models.CommentResponse, error)
 }
 
 func (d *Database) AddComment(ctx context.Context, req *models.CommentRequest) error {
@@ -34,19 +34,20 @@ func (d *Database) AddComment(ctx context.Context, req *models.CommentRequest) e
 	return nil
 }
 
-func (d *Database) GetComments(ctx context.Context, title string) ([]models.Comment, error) {
+func (d *Database) GetComments(ctx context.Context, title string) ([]models.CommentResponse, error) {
 	rows, err := d.db.Query(ctx, `
-		SELECT c.content, c.created_at FROM comments
-		JOIN lessons l on l.id = c.lesson_id
-		WHERE l.title=$1
+		SELECT u.first_name, u.last_name, c.content, c.created_at  FROM comments c
+		JOIN users u ON u.id = c.user_id
+		JOIN lessons l ON l.id = c.lesson_id
+		WHERE l.title=$1;
 	`, title)
 	if err != nil {
 		return nil, err
 	}
-	var result []models.Comment
+	var result []models.CommentResponse
 	for rows.Next() {
-		var c models.Comment
-		if err := rows.Scan(&c.Content, &c.CreatedAt); err != nil {
+		var c models.CommentResponse
+		if err := rows.Scan(&c.FirstName, &c.LastName, &c.Content, &c.CreatedAt); err != nil {
 			return nil, err
 		}
 		result = append(result, c)
