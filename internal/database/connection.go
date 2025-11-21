@@ -1,33 +1,30 @@
 package database
 
 import (
-	"algolearn/internal/config"
 	"context"
 	"log"
+	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Database struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
 func Connect(ctx context.Context) *Database {
 
-	conn, err := pgx.Connect(ctx, config.GetString("POSTGRES_URL"))
+	pool, err := pgxpool.New(ctx, os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Successfully connected to database")
 	return &Database{
-		db: conn,
+		db: pool,
 	}
 }
 
-func Close(ctx context.Context, conn *Database) {
-	err := conn.db.Close(ctx)
-	if err != nil {
-		log.Println(err)
-	}
+func Close(conn *Database) {
+	conn.db.Close()
 	log.Println("Successfully closed database")
 }
