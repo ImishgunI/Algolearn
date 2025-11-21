@@ -46,18 +46,24 @@ document.querySelectorAll(".btn-start").forEach((btn) => {
 });
 
 function updateAuthButtons() {
+  const authButtons = document.getElementById("authButtons");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const authContainer = document.getElementById("authButtons");
 
-  if (!authContainer) return;
+  if (!authButtons) return;
 
   if (isLoggedIn) {
-    authContainer.innerHTML = `
-            <a href="dashboard.html" class="btn">Личный кабинет</a>
-            <a href="#" class="btn logout" onclick="logout()">Выйти</a>
-        `;
+    const role = localStorage.getItem("role");
+    console.log(role)
+    let buttonsHTML = `
+      <a href="dashboard.html" class="btn">Личный кабинет</a>
+      <button onclick="logout()" class="btn logout">Выйти</button>
+    `;
+    if (role === "admin") {
+      buttonsHTML += `<button onclick="window.location.href='admin-dashboard.html'">Админ-панель</button>`;
+    }
+    authButtons.innerHTML = buttonsHTML;
   } else {
-    authContainer.innerHTML = `
+    authButtons.innerHTML = `
             <a href="login.html" class="btn">Вход</a>
             <a href="registration.html" class="btn">Регистрация</a>
         `;
@@ -65,9 +71,9 @@ function updateAuthButtons() {
 }
 
 function logout() {
-  localStorage.removeItem("isLoggedIn");
-  localStorage.removeItem("user_role");
-  localStorage.removeItem("user_email");
+  localStorage.setItem("isLoggedIn", false);
+  localStorage.removeItem("role");
+  localStorage.removeItem("email");
   alert("Вы вышли из аккаунта");
   updateAuthButtons();
 }

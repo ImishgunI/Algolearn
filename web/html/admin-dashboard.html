@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админ-панель — AlgoLearn</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <a href="index.html"><h2>AlgoLearn</h2></a>
+                </div>
+                <div class="auth-buttons" id="authButtons"></div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container admin-dashboard">
+        <div class="admin-header">
+            <h1>Панель администратора</h1>
+            <div class="admin-info">
+                <span>Добро пожаловать, <strong id="adminName"></strong></span>
+                <span class="role-badge admin">Администратор</span>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Статистика -->
+            <section class="admin-card stats-card">
+                <h2>📊 Статистика платформы</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="usersCount">0</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="lessonsCount">0</div>
+                        <div class="stat-label">Уроков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="commentsCount">0</div>
+                        <div class="stat-label">Комментариев</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="tasksCount">0</div>
+                        <div class="stat-label">Задач</div>
+                    </div>
+                </div>
+                <button onclick="loadStats()" class="refresh-btn">🔄 Обновить</button>
+            </section>
+
+            <!-- Управление пользователями -->
+            <section class="admin-card users-card">
+                <h2>👥 Управление пользователями</h2>
+                <div class="card-actions">
+                    <button onclick="showAllUsers()" class="btn-primary">Все пользователи</button>
+                    <button onclick="showAddUserForm()" class="btn-success">➕ Добавить пользователя</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="userSearch" placeholder="Поиск по email или имени..." onkeyup="searchUsers()">
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Список пользователей -->
+                </div>
+            </section>
+
+            <!-- Управление уроками -->
+            <section class="admin-card lessons-card">
+                <h2>📚 Управление уроками</h2>
+                <div class="card-actions">
+                    <button onclick="loadAllLessons()" class="btn-primary">Все уроки</button>
+                    <button onclick="showAddLessonForm()" class="btn-success">➕ Добавить урок</button>
+                </div>
+                <div class="lessons-list" id="lessonsList">
+                    <!-- Список уроков -->
+                </div>
+            </section>
+
+            <!-- Модерация комментариев -->
+            <section class="admin-card comments-card">
+                <h2>💬 Модерация комментариев</h2>
+                <div class="card-actions">
+                    <button onclick="loadAllComments()" class="btn-primary">Все комментарии</button>
+                </div>
+                <div class="comments-list" id="commentsList">
+                    <!-- Список комментариев -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Модальные окна -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="userModalTitle">Добавить пользователя</h2>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label for="userFirstName">Имя:</label>
+                    <input type="text" id="userFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="userLastName">Фамилия:</label>
+                    <input type="text" id="userLastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email:</label>
+                    <input type="email" id="userEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Пароль:</label>
+                    <input type="password" id="userPassword">
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Роль:</label>
+                    <select id="userRole" required>
+                        <option value="student">Студент</option>
+                        <option value="manager">Менеджер</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-success">Сохранить</button>
+                    <button type="button" onclick="closeModal('userModal')" class="btn-secondary">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="lessonModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="lessonModalTitle">Добавить урок</h2>
+            <form id="lessonForm">
+                <input type="hidden" id="lessonId">
+                <div class="form-group">
+                    <label for="lessonTitle">Название:</label>
+                    <input type="text" id="lessonTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="lessonCategory">Категория:</label>
+                    <select id="lessonCategory" required>
+                        <option value="sorts">Сортировки</option>
+                        <option value="search">Поиск</option>
+                        <option value="recursion">Рекурсия</option>
+                        <option value="dynamic">Динамическое программирование</option>
+                        <option value="trees">Деревья и графы</option>
+                        <option value="difficult">Сложность</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lessonDifficulty">Сложность:</label>
+                    <select id="lessonDifficulty" required>
+                        <option value="beginner">Начальный</option>
+                        <option value="intermediate">Средний</option>
+                        <option value="advanced">Продвинутый</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lessonContent">Содержание:</label>
+                    <textarea id="lessonContent" rows="6" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-success">Сохранить</button>
+                    <button type="button" onclick="closeModal('lessonModal')" class="btn-secondary">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

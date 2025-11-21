@@ -23,7 +23,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             localStorage.setItem("last_name", data.last_name);
             localStorage.setItem("email", data.email);
             localStorage.setItem("role", data.role);
-            window.location.href = 'dashboard.html';
+            window.location.href = 'index.html'
         } else {
             const error = await response.text();
             alert('Ошибка: ' + error);
