@@ -13,3 +13,16 @@ func CheckPasswordHash(password, hash string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil, err
 }
+
+func CheckRoleForNewUsers(email string) string {
+	var role string
+	switch email {
+	case "adminemail@gmail.com":
+		role = "admin"
+	case "manageremail@gmail.com":
+		role = "manager"
+	default:
+		role = "student"
+	}
+	return role
+}
