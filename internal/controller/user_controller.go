@@ -48,7 +48,7 @@ func (h *Handler) RegisterController(c *gin.Context) {
 	user.LastName = req.LastName
 	user.Email = req.Email
 	user.PasswordHash = hashed
-	user.Role = "student"
+	user.Role = services.CheckRoleForNewUsers(req.Email)
 	err = h.Db.Register(c.Request.Context(), user)
 	if err != nil {
 		log.Println("Failed to register user:", err)
