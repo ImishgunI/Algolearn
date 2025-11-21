@@ -21,3 +21,12 @@ type CommentResponse struct {
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type CommentGetter struct {
+	ID          int       `json:"id"`
+	FirstName   string    `json:"first_name"`
+	LastName    string    `json:"last_name"`
+	LessonTitle string    `json:"lesson_title"`
+	Content     string    `json:"content"`
+	CreatedAt   time.Time `json:"created_at"`
+}

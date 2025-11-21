@@ -7,6 +7,21 @@ type Lesson struct {
 	Content    string `json:"content" db:"content"`
 }
 
+type AdminLessons struct {
+	ID         int    `json:"id"`
+	Title      string `json:"title" db:"title"`
+	Category   string `json:"category" db:"category"`
+	Difficulty string `json:"difficulty" db:"difficulty"`
+	Content    string `json:"content" db:"content"`
+}
+
+type LessonCreator struct {
+	Title      string `json:"title" db:"title"`
+	Category   string `json:"category" db:"category"`
+	Difficulty string `json:"difficulty" db:"difficulty"`
+	Content    string `json:"content" db:"content"`
+}
+
 func NewLesson() *Lesson {
 	return &Lesson{}
 }
