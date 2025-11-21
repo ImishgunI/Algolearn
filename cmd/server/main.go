@@ -31,5 +31,5 @@ func main() {
 	if err := http.ListenAndServe(":"+config.GetString("PORT"), handler); err != nil {
 		log.Fatal(err)
 	}
-	defer database.Close(ctx, db)
+	defer database.Close(db)
 }
