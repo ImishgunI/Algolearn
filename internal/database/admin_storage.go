@@ -15,6 +15,7 @@ type AdminRepository interface {
 	GetAllComments(ctx context.Context) ([]models.CommentGetter, error)
 	DeleteUser(ctx context.Context, id int) error
 	DeleteLesson(ctx context.Context, id int) error
+	DeleteComment(ctx context.Context, id int) error
 	AddLesson(ctx context.Context, req *models.LessonCreator) error
 	AddUser(ctx context.Context, req *models.UserCreator) error
 	UpdateLesson(ctx context.Context, req *models.LessonCreator, id int) error
@@ -132,6 +133,14 @@ func (d *Database) DeleteLesson(ctx context.Context, id int) error {
 	_, err := d.db.Exec(ctx, `
 		DELETE FROM lessons WHERE id=$1
 	`, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Database) DeleteComment(ctx context.Context, id int) error {
+	_, err := d.db.Exec(ctx, `DELETE FROM comments WHERE id=$1`, id)
 	if err != nil {
 		return err
 	}
