@@ -13,7 +13,6 @@ type Database struct {
 }
 
 func Connect(ctx context.Context) *Database {
-
 	pool, err := pgxpool.New(ctx, os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		log.Fatal(err)
