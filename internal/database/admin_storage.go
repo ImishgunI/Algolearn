@@ -25,7 +25,8 @@ func (d *Database) GetAllUsers(ctx context.Context) ([]models.AdminResponse, err
 	rows, err := d.db.Query(ctx, `
 		SELECT id, first_name, last_name, email, role 
 		FROM users 
-		WHERE role <> 'admin';
+		WHERE role <> 'admin'
+		ORDER BY id
 	`)
 	if err != nil {
 		return nil, err
@@ -59,6 +60,7 @@ func (d *Database) GetStatistics(ctx context.Context) (*models.AdminStatistics, 
 func (d *Database) GetLessonsForAdmin(ctx context.Context) ([]models.AdminLessons, error) {
 	rows, err := d.db.Query(ctx, `
 		SELECT id, title, category, difficulty, content FROM lessons
+		ORDER BY id
 	`)
 	if err != nil {
 		return nil, err
@@ -101,6 +103,7 @@ func (d *Database) GetAllComments(ctx context.Context) ([]models.CommentGetter, 
 	SELECT c.id, u.first_name, u.last_name, l.title AS lesson_title, c.content, c.created_at FROM comments c
 	JOIN users u ON u.id = c.user_id
 	JOIN lessons l ON l.id = c.lesson_id
+	ORDER BY c.created_at
 	`)
 	if err != nil {
 		return nil, err
