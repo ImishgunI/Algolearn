@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStats();
     showAllUsers();
     loadAllLessons();
-    loadPendingComments();
+    loadAllComments();
 });
 
 // ==================== СТАТИСТИКА ====================
@@ -241,6 +241,8 @@ async function loadAllComments() {
         if (response.ok) {
             const data = await response.json();
             displayComments(data.comments);
+        } else {
+            console.error("Ошибка загрузки комментариев")
         }
     } catch (err) {
         console.error('Ошибка сети:', err);
