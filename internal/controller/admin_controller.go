@@ -287,3 +287,28 @@ func (h *AdminHandler) GetAllComments(c *gin.Context) {
 		"comments": comments,
 	})
 }
+
+func (h *AdminHandler) DeleteComment(c *gin.Context) {
+	id := c.Param("commentId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid param",
+		})
+		return
+	}
+	commentID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to convert string to int",
+		})
+		return
+	}
+	err = h.db.DeleteComment(c.Request.Context(), commentID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
+}
