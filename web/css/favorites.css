@@ -1,0 +1,39 @@
+     .favorites-container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        .favorite-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+        }
+        .favorite-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .favorite-actions button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-open {
+            background: #0078D7; 
+            color: white;
+        }
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+        }
+        .empty {
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
