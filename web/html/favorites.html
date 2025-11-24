@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Избранные уроки — AlgoLearn</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/favorites.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo"><h2><a href="index.html">AlgoLearn</a></h2></div>
+            <ul class="nav-menu">
+                <li><a href="index.html#courses">Курсы</a></li>
+                <li><a href="favorites.html"><i class="fa-solid fa-star"></i> Избранное</a></li>
+            </ul>
+            <div class="auth-buttons" id="authButtons"></div>
+        </nav>
+    </div>
+</header>
+
+<div class="favorites-container">
+    <h2>⭐ Избранные уроки</h2>
+    <div id="favoritesList"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.querySelector('.header');
+        const favoritesContainer = document.querySelector('.favorites-container');
+        
+        if (header && favoritesContainer) {
+            const headerHeight = header.offsetHeight;
+            favoritesContainer.style.paddingTop = (headerHeight + 20) + 'px';
+        }
+    });
+    function loadFavorites() {
+        const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+        const container = document.getElementById("favoritesList");
+
+        if (favs.length === 0) {
+            container.innerHTML = `<div class="empty">У вас пока нет избранных уроков</div>`;
+            return;
+        }
+
+        container.innerHTML = favs.map(f => `
+            <div class="favorite-item">
+                <div class="favorite-title">${f.title}</div>
+                <div class="favorite-actions">
+                    <button class="btn-open" onclick="openFav('${f.page}', '${f.topic}')">
+                        Открыть
+                    </button>
+                    <button class="btn-remove" onclick="removeFavorite(${f.id})">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openFav(page, topic) {
+        window.location.href = `${page}.html#${topic}`;
+    }
+
+    function removeFavorite(id) {
+        let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+        favs = favs.filter(f => f.id !== id);
+        localStorage.setItem("favorites", JSON.stringify(favs));
+        loadFavorites();
+    }
+
+    loadFavorites();
+</script>
+
+</body>
+</html>
