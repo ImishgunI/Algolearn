@@ -3,10 +3,10 @@ package models
 import "time"
 
 type Comment struct {
+	CreatedAt time.Time `db:"created_at"`
+	Content   string    `db:"content" json:"content"`
 	UserID    int       `db:"user_id"`
 	LessonID  int       `db:"lesson_id"`
-	Content   string    `db:"content" json:"content"`
-	CreatedAt time.Time `db:"created_at"`
 }
 
 type CommentRequest struct {
@@ -16,17 +16,17 @@ type CommentRequest struct {
 }
 
 type CommentResponse struct {
+	CreatedAt time.Time `json:"created_at"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
 }
 
 type CommentGetter struct {
-	ID          int       `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
 	FirstName   string    `json:"first_name"`
 	LastName    string    `json:"last_name"`
 	LessonTitle string    `json:"lesson_title"`
 	Content     string    `json:"content"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int       `json:"id"`
 }

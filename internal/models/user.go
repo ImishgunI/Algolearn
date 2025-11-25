@@ -9,11 +9,11 @@ type User struct {
 }
 
 type AdminResponse struct {
-	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Role      string `json:"role"`
+	ID        int    `json:"id"`
 }
 
 type UserCreator struct {

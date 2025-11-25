@@ -12,8 +12,8 @@ type FavoritesRepository interface {
 
 func (d *Database) AddFavoriteLesson(ctx context.Context, email string, title string) error {
 	type Result struct {
-		id  int
 		err error
+		id  int
 	}
 	user_id_ch := make(chan Result, 1)
 	lesson_id_ch := make(chan Result, 1)

@@ -8,11 +8,11 @@ type Lesson struct {
 }
 
 type AdminLessons struct {
-	ID         int    `json:"id"`
 	Title      string `json:"title" db:"title"`
 	Category   string `json:"category" db:"category"`
 	Difficulty string `json:"difficulty" db:"difficulty"`
 	Content    string `json:"content" db:"content"`
+	ID         int    `json:"id"`
 }
 
 type LessonCreator struct {
