@@ -8,6 +8,7 @@ import (
 type FavoritesRepository interface {
 	AddFavoriteLesson(ctx context.Context, email string, title string) error
 	GetFavoritesByEmail(ctx context.Context, email string) ([]models.FavoritesList, error)
+	DeleteFavoriteByID(ctx context.Context, lesson_id int) error
 }
 
 func (d *Database) AddFavoriteLesson(ctx context.Context, email string, title string) error {
@@ -61,4 +62,12 @@ func (d *Database) GetFavoritesByEmail(ctx context.Context, email string) ([]mod
 		result = append(result, fl)
 	}
 	return result, nil
+}
+
+func (d *Database) DeleteFavoriteByID(ctx context.Context, lesson_id int) error {
+	_, err := d.db.Exec(ctx, `DELETE FROM favorites WHERE lesson_id=$1`, lesson_id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
