@@ -382,8 +382,6 @@ async function loadPage() {
   document.getElementById("content").innerHTML = `
         <h1>${topic.name}</h1>
         <button class="favorite-btn" onclick="toggleFavorite(
-            '${page}',
-            '${topicKey}',
             '${topic.name}'
         )">⭐ В избранное
         </button>

@@ -83,3 +83,33 @@ window.logout = logout;
 document.addEventListener("DOMContentLoaded", function () {
   updateAuthButtons();
 });
+
+
+async function toggleFavorite(title) {
+    const token = localStorage.getItem("isLoggedIn");
+    const email = localStorage.getItem("email");
+
+    if (!token) {
+        alert("Нужно войти в аккаунт");
+        window.location.href = 'login.html';
+        return;
+    }
+    try {
+      const response = await fetch("http://localhost:8080/favorites/toggle", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              lesson_title: title,
+              email: email,
+          })
+      });
+      if (response.ok) {
+        alert("Урок добавлен в избранное")
+        showAllFavorites();
+      } 
+    } catch(error) {
+      console.error(error)
+    }
+}
