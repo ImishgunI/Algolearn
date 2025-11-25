@@ -34,6 +34,15 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
+
+CREATE TABLE IF NOT EXISTS favorites (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT now(),
+    UNIQUE(user_id, lesson_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_lessons_title ON lessons(title);
 CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
@@ -42,4 +51,6 @@ CREATE INDEX IF NOT EXISTS idx_tasks_title ON tasks(title);
 CREATE INDEX IF NOT EXISTS idx_tasks_difficulty ON tasks(difficulty);
 CREATE INDEX IF NOT EXISTS idx_comments_lesson_id ON comments(lesson_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_lesson_id ON favorites(lesson_id);
 
