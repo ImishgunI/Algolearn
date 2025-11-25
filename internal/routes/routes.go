@@ -31,6 +31,7 @@ func SetRoutes(r *gin.Engine, db *database.Database) {
 	r.DELETE("/admin/lessons/:lessonId", ha.DeleteLesson)
 	r.DELETE("/admin/users/:userId", ha.DeleteUser)
 	r.DELETE("/admin/comments/:commentId", ha.DeleteComment)
+	r.DELETE("/favorites/remove/:lessonId", hf.DeleteFavorite)
 	r.PUT("/admin/update/lessons/:lessonId", ha.UpdateLesson)
 	r.PUT("/admin/update/users/:userId", ha.UpdateUser)
 }
