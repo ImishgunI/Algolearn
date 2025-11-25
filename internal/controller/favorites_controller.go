@@ -3,6 +3,7 @@ package controller
 import (
 	"algolearn/internal/database"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,4 +57,29 @@ func (h *FavoriteHandler) GetFavorites(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"favorites": list,
 	})
+}
+
+func (h *FavoriteHandler) DeleteFavorite(c *gin.Context) {
+	id := c.Param("lessonId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid query parametr",
+		})
+		return
+	}
+	lessonId, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to convert string to int",
+		})
+		return
+	}
+	err = h.repo.DeleteFavoriteByID(c.Request.Context(), lessonId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
 }
