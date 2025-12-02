@@ -93,3 +93,88 @@ func (h *Handler) LoginController(c *gin.Context) {
 	})
 	log.Println("User Login Success")
 }
+
+func (h *Handler) GetDataController(c *gin.Context) {
+	email := c.Query("email")
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid email",
+		})
+		return
+	}
+	u, err := h.Db.GetUserData(c.Request.Context(), &email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"first_name": u.FirstName,
+		"last_name":  u.LastName,
+		"email":      u.Email,
+		"role":       u.Role,
+	})
+}
+
+func (h *Handler) UpdateUserData(c *gin.Context) {
+	var req struct {
+		Username string `json:"username"`
+		Lastname string `json:"lastname"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+	ud := models.UserUpdate{}
+	ud.FirstName = req.Username
+	ud.LastName = req.Lastname
+	ud.Email = req.Email
+	if req.Password != "" {
+		psh, err := services.HashPassword(req.Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		ud.PasswordHash = psh
+	} else {
+		ud.PasswordHash = ""
+	}
+
+	err := h.Db.UpdateUserData(c.Request.Context(), &ud)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func (h *Handler) GetProgress(c *gin.Context) {
+	email := c.Query("email")
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid email",
+		})
+		return
+	}
+	completed, favorites, err := h.Db.GetUserProgress(c.Request.Context(), &email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"completed": completed,
+		"favorites": favorites,
+	})
+}
