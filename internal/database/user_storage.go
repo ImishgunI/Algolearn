@@ -11,6 +11,9 @@ import (
 type UserRepository interface {
 	Register(context context.Context, user *models.User) error
 	Login(context context.Context, user *models.User) (bool, error)
+	GetUserData(ctx context.Context, email *string) (*models.UserCreator, error)
+	UpdateUserData(ctx context.Context, userdata *models.UserUpdate) error
+	GetUserProgress(ctx context.Context, email *string) (int, int, error)
 }
 
 func (d *Database) Register(context context.Context, user *models.User) error {
@@ -40,4 +43,58 @@ func (d *Database) Login(context context.Context, user *models.User) (*models.Us
 		return nil, fmt.Errorf("%v", err)
 	}
 	return user, nil
+}
+
+func (d *Database) GetUserData(ctx context.Context, email *string) (*models.UserCreator, error) {
+	var u models.UserCreator
+	err := d.db.QueryRow(ctx, `SELECT first_name, last_name, email, role FROM users WHERE email=$1`, email).Scan(&u.FirstName, &u.LastName, &u.Email, &u.Role)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (d *Database) UpdateUserData(ctx context.Context, userdata *models.UserUpdate) error {
+	if userdata.PasswordHash == "" {
+		_, err := d.db.Exec(ctx, `
+		UPDATE users
+		SET first_name = $1, last_name = $2
+		WHERE email = $3
+		`, userdata.FirstName, userdata.LastName, userdata.Email)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err := d.db.Exec(ctx, `
+		UPDATE users
+		SET first_name = $1, last_name = $2, password_hash = $3
+		WHERE email = $4
+		`, userdata.FirstName, userdata.LastName, userdata.PasswordHash, userdata.Email)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (d *Database) GetUserProgress(ctx context.Context, email *string) (int, int, error) {
+	var done_lessons int
+	err := d.db.QueryRow(ctx, ` 
+		SELECT COUNT(*) as done_lessons from completed_lessons as cl
+		JOIN users u ON u.id = cl.user_id
+		WHERE u.email = $1
+	`, email).Scan(&done_lessons)
+	if err != nil {
+		return 0, 0, nil
+	}
+	var favorites_lessons int
+	err = d.db.QueryRow(ctx, `
+	SELECT COUNT(*) as favorites_lessons FROM favorites as f
+	JOIN users u ON u.id = f.user_id
+	WHERE u.email = $1
+	`, email).Scan(&favorites_lessons)
+	if err != nil {
+		return 0, 0, nil
+	}
+	return done_lessons, favorites_lessons, nil
 }
