@@ -55,7 +55,7 @@ function updateAuthButtons() {
     const role = localStorage.getItem("role");
     console.log(role)
     let buttonsHTML = `
-      <a href="dashboard.html" class="btn">Личный кабинет</a>
+      <a href="user_profile.html" class="btn">Личный кабинет</a>
       <button onclick="logout()" class="btn logout">Выйти</button>
     `;
     if (role === "admin") {
