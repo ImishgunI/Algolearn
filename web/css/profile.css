@@ -1,0 +1,84 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-wrapper {
+    width: 90%;
+    max-width: 650px;
+    margin: 40px auto;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.box {
+    background: white;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.user-info input {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 10px;
+    background: #3f7cff;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #3268d9;
+}
+
+.stats .stat-item {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.link-btn {
+    padding: 10px;
+    background: #ddd;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    color: black;
+}
+
+.link-btn:hover {
+    background: #ccc;
+}
+
+.logout-btn {
+    padding: 10px;
+    border-radius: 6px;
+    color: white;
+    background: #e24b4b;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: #c73838;
+}
