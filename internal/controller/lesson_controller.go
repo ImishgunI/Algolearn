@@ -11,6 +11,7 @@ import (
 
 type LessonFactory interface {
 	GetLessons(c *gin.Context)
+	SetDone(c *gin.Context)
 }
 
 type LessonHandler struct {
@@ -36,4 +37,31 @@ func (h *LessonHandler) GetLessons(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"lessons": ls,
 	})
+}
+
+func (h *LessonHandler) SetDone(c *gin.Context) {
+	email := c.Query("email")
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid email",
+		})
+		return
+	}
+	var req struct {
+		Lesson_title string `json:"lesson_title"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+	err := h.db.SetLessonComplete(c.Request.Context(), email, req.Lesson_title)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
 }
