@@ -20,8 +20,17 @@
         <label>Имя:</label>
         <input id="usernameInput" type="text">
 
+        <label>Фамилия:</label>
+        <input id="lastnameInput" type="text">
+
         <label>Email:</label>
         <input id="emailInput" type="text" disabled>
+
+        <label>Password:</label>
+        <input id="passwordInput" type="text" placeholder="Обновить пароль">
+
+        <label>Role:</label>
+        <input id="roleInput" type="text" disabled>
 
         <button class="save-btn" onclick="saveProfile()">Сохранить</button>
     </section>
@@ -32,9 +41,7 @@
         <h3>Статистика</h3>
 
         <div class="stat-item">Пройдено уроков: <span id="progressCompleted">0</span></div>
-        <div class="stat-item">Всего уроков: <span id="progressTotal">0</span></div>
         <div class="stat-item">Избранных уроков: <span id="favoritesCount">0</span></div>
-        <div class="stat-item">Просмотрено тем: <span id="topicsViewed">0</span></div>
     </section>
 
 
@@ -48,7 +55,7 @@
 
 </div>
 
-<script src="profile.js"></script>
+<script src="js/user_profile.js"></script>
 
 </body>
 </html>
