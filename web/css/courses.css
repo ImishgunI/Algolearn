@@ -148,3 +148,23 @@ textarea:focus {
     border: 1px solid #dc3545;
     color: #721c24;
 }
+
+
+.done-lesson {
+    background: #4a8cff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.done-lesson:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lesson-done {
+    background: #3cb371 !important;
+}
