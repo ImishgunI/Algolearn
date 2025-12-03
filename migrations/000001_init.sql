@@ -43,6 +43,15 @@ CREATE TABLE IF NOT EXISTS favorites (
     UNIQUE(user_id, lesson_id)
 );
 
+CREATE TABLE IF NOT EXISTS completed_lessons (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_title VARCHAR(200) NOT NULL,
+    completed_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (user_id, lesson_title)
+);
+
+
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_lessons_title ON lessons(title);
 CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
@@ -53,4 +62,5 @@ CREATE INDEX IF NOT EXISTS idx_comments_lesson_id ON comments(lesson_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_lesson_id ON favorites(lesson_id);
-
+CREATE INDEX IF NOT EXISTS idx_completed_lessons_user_id ON completed_lessons(user_id);
+CREATE INDEX IF NOT EXISTS idx_completed_lessons_lesson_title ON completed_lessons(lesson_title);
