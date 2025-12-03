@@ -23,6 +23,13 @@ type UserCreator struct {
 	Role      string `json:"role"`
 }
 
+type UserUpdate struct {
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"password_hash"`
+}
+
 func NewUser() *User {
 	return &User{}
 }
