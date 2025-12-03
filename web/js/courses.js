@@ -385,7 +385,7 @@ async function loadPage() {
             '${topic.name}'
         )">⭐ В избранное
         </button>
-
+        <button id="done-lesson-btn" class="done-lesson" onclick="setDoneLesson('${topic.name}')">Отметить пройденным</button>
 
         <div class="theory">${topic.theory}</div>
         <pre><code class="language-js">${topic.code}</code></pre>
@@ -535,6 +535,44 @@ window.addEventListener("hashchange", function () {
   console.log("Hash changed, reloading page...");
   loadPage();
 });
+
+async function setDoneLesson(lessonTitle) {
+    const email = localStorage.getItem("email");
+
+    if (!email) {
+        alert("Войдите в аккаунт, чтобы отмечать уроки пройденными.");
+        return;
+    }
+
+    const btn = document.getElementById("done-lesson-btn");
+
+    btn.disabled = true;
+    btn.textContent = "Сохраняю...";
+
+    try {
+        const response = await fetch(`http://localhost:8080/lessons/complete?email=${email}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                lesson_title: lessonTitle
+            })
+        });
+
+        if (response.ok) {
+            btn.textContent = "Урок пройден";
+            btn.classList.add("lesson-done");
+        } else {
+            btn.textContent = "Ошибка! Попробовать снова";
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error("Ошибка сети:", err);
+        btn.textContent = "Ошибка сети!";
+        btn.disabled = false;
+    }
+}
+
+document.getElementById("done-lesson").addEventListener()
 
 // === ВИЗУАЛИЗАЦИИ ===
 function visualizeBubble(mode) {

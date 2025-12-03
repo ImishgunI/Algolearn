@@ -53,12 +53,18 @@ function updateAuthButtons() {
 
   if (isLoggedIn) {
     const role = localStorage.getItem("role");
-    console.log(role)
-    let buttonsHTML = `
-      <a href="user_profile.html" class="btn">Личный кабинет</a>
-      <button onclick="logout()" class="btn logout">Выйти</button>
-    `;
+    let buttonsHTML;
+    if (role === "student") {
+      buttonsHTML = `
+        <a href="user_profile.html" class="btn">Личный кабинет</a>
+        <button onclick="logout()" class="btn logout">Выйти</button>
+      `;
+    }
     if (role === "admin") {
+      buttonsHTML = `
+        <a href="dashboard.html" class="btn">Личный кабинет</a>
+        <button onclick="logout()" class="btn logout">Выйти</button>
+      `;
       buttonsHTML += `<button onclick="window.location.href='admin-dashboard.html'">Админ-панель</button>`;
     }
     authButtons.innerHTML = buttonsHTML;
