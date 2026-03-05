@@ -2,17 +2,17 @@ FROM golang:1.26.0-alpine AS builder
 
 WORKDIR /build
 
-COPY go.mod go.sum
+COPY go.mod go.sum ./
 
-#RUN go mod download
+RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /src/main ./cmd/service/
+RUN CGO_ENABLED=0 GOOS=linux go build -o /build/main ./cmd/service/
 
 FROM alpine:latest
 
-COPY --from=builder /src/main .
+COPY --from=builder /build/main .
 
 EXPOSE 8000
 
