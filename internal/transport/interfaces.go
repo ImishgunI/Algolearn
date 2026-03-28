@@ -9,3 +9,8 @@ type Registrator interface {
 type Authorizer interface {
 	SignIn(c fiber.Ctx) error
 }
+
+type UserRegistrationInfo struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
