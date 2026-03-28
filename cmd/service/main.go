@@ -1,7 +1,6 @@
 package main
 
 import (
-	"Algolearn/internal/transport/http"
 	"context"
 	"log"
 	"os"
@@ -15,7 +14,6 @@ import (
 func main() {
 
 	app := fiber.New()
-	http.Routes(app)
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
 			log.Fatalf("listen error %+v\n", err)
