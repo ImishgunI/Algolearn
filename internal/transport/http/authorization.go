@@ -23,12 +23,32 @@ func (a *Authorization) SignIn(c fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	token, err := a.service.SignIn(c.Context(), input)
+	access, refresh, err := a.service.SignIn(c.Context(), input)
 	if err != nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
 	return c.JSON(fiber.Map{
-		"access_token": token,
+		"access_token":  access,
+		"refresh_token": refresh,
+	})
+}
+
+func (a *Authorization) Refresh(c fiber.Ctx) error {
+	var body struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := c.Bind().Body(&body); err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	access, err := a.service.Refresh(c.Context(), body.RefreshToken)
+	if err != nil {
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	return c.JSON(fiber.Map{
+		"access_token": access,
 	})
 }
