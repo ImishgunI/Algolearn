@@ -5,6 +5,9 @@ import (
 	"Algolearn/internal/users"
 	"context"
 	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type RegisterInput struct {
@@ -14,11 +17,16 @@ type RegisterInput struct {
 	Password string `json:"password"`
 }
 
-type AuthService struct {
-	repo db.UserCreator
+type LoginInput struct {
+	Email    string
+	Password string
 }
 
-func NewService(repo db.UserCreator) *AuthService {
+type AuthService struct {
+	repo db.UserRepository
+}
+
+func NewService(repo db.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
@@ -49,4 +57,42 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) error {
 	}
 
 	return nil
+}
+
+func (s *AuthService) SignIn(ctx context.Context, input LoginInput) (string, error) {
+	// 1. валидация
+	if input.Email == "" || input.Password == "" {
+		return "", fmt.Errorf("email and password required")
+	}
+
+	// 2. найти пользователя
+	user, err := s.repo.GetByEmail(ctx, input.Email)
+	if err != nil {
+		return "", fmt.Errorf("get user: %w", err)
+	}
+
+	// 3. проверить пароль
+	if !users.CheckPasswordHash(input.Password, user.PasswordHash) {
+		return "", fmt.Errorf("invalid credentials")
+	}
+
+	// 4. создать JWT
+	token, err := s.createAccessToken(user)
+	if err != nil {
+		return "", fmt.Errorf("create token: %w", err)
+	}
+
+	return token, nil
+}
+
+func (s *AuthService) createAccessToken(user *users.User) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"role":    user.Role,
+		"exp":     time.Now().Add(time.Hour * 1).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte("secret"))
 }
