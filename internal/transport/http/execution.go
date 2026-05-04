@@ -28,9 +28,22 @@ func (h *ExecutionHandler) Execute(c fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	steps, err := h.manager.Execute(req.Algorithm, req.Data)
+	execID, err := h.manager.Execute(c.Context(), req.Algorithm, req.Data)
 	if err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	return c.JSON(fiber.Map{
+		"execution_id": execID,
+	})
+}
+
+func (h *ExecutionHandler) Get(c fiber.Ctx) error {
+	execID := c.Params("id")
+
+	steps, err := h.manager.Get(c.Context(), execID)
+	if err != nil {
+		return c.SendStatus(fiber.StatusNotFound)
 	}
 
 	return c.JSON(fiber.Map{
