@@ -4,6 +4,8 @@ import (
 	"Algolearn/internal/infrastructure/db"
 	"Algolearn/internal/users"
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -23,11 +25,15 @@ type LoginInput struct {
 }
 
 type AuthService struct {
-	repo db.UserRepository
+	repo     db.UserRepository
+	sessions db.SessionRepository
 }
 
-func NewService(repo db.UserRepository) *AuthService {
-	return &AuthService{repo: repo}
+func NewService(repo db.UserRepository, session db.SessionRepository) *AuthService {
+	return &AuthService{
+		repo:     repo,
+		sessions: session,
+	}
 }
 
 func (s *AuthService) Register(ctx context.Context, input RegisterInput) error {
@@ -59,30 +65,37 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) error {
 	return nil
 }
 
-func (s *AuthService) SignIn(ctx context.Context, input LoginInput) (string, error) {
-	// 1. валидация
+func (s *AuthService) SignIn(ctx context.Context, input LoginInput) (string, string, error) {
 	if input.Email == "" || input.Password == "" {
-		return "", fmt.Errorf("email and password required")
+		return "", "", fmt.Errorf("invalid input")
 	}
 
-	// 2. найти пользователя
 	user, err := s.repo.GetByEmail(ctx, input.Email)
 	if err != nil {
-		return "", fmt.Errorf("get user: %w", err)
+		return "", "", fmt.Errorf("user not found")
 	}
 
-	// 3. проверить пароль
 	if !users.CheckPasswordHash(input.Password, user.PasswordHash) {
-		return "", fmt.Errorf("invalid credentials")
+		return "", "", fmt.Errorf("invalid credentials")
 	}
 
-	// 4. создать JWT
-	token, err := s.createAccessToken(user)
+	access, err := s.createAccessToken(user)
 	if err != nil {
-		return "", fmt.Errorf("create token: %w", err)
+		return "", "", err
 	}
 
-	return token, nil
+	refresh, err := s.createRefreshToken()
+	if err != nil {
+		return "", "", err
+	}
+
+	// сохраняем refresh в БД
+	err = s.sessions.CreateSession(ctx, user.ID, refresh, time.Now().Add(7*24*time.Hour))
+	if err != nil {
+		return "", "", err
+	}
+
+	return access, refresh, nil
 }
 
 func (s *AuthService) createAccessToken(user *users.User) (string, error) {
@@ -95,4 +108,27 @@ func (s *AuthService) createAccessToken(user *users.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte("secret"))
+}
+
+func (s *AuthService) createRefreshToken() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(b), nil
+}
+
+func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (string, error) {
+	userID, err := s.sessions.GetSession(ctx, refreshToken)
+	if err != nil {
+		return "", fmt.Errorf("invalid session")
+	}
+
+	user, err := s.repo.GetByID(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+
+	return s.createAccessToken(user)
 }
