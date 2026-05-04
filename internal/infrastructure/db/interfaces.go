@@ -1,10 +1,10 @@
 package db
 
 import (
-	"Algolearn/internal/transport"
+	"Algolearn/internal/users"
 	"context"
 )
 
 type UserCreator interface {
-	CreateUser(ctx context.Context, user_data *transport.UserRegistrationInfo) error
+	CreateUser(ctx context.Context, user *users.User) error
 }
