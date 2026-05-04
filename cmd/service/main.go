@@ -3,31 +3,46 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/gofiber/fiber/v3"
+	"Algolearn/internal/auth"
+	"Algolearn/internal/infrastructure/db/sql"
+	"Algolearn/internal/infrastructure/db/userauth"
+	"Algolearn/internal/transport"
+	"Algolearn/internal/transport/http"
 )
 
 func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	app := fiber.New()
+	psql, err := sql.NewPool(ctx, "")
+	if err != nil {
+		log.Fatalf("db error: %+v", err)
+	}
+	defer psql.Close()
+
+	repo := userauth.NewReg(psql)
+	service := auth.NewService(repo)
+	handler := http.NewRegistration(service)
+
+	app := transport.Routes(handler)
+
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
 			log.Fatalf("listen error %+v\n", err)
 		}
 	}()
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigchan
-	log.Printf("Shutdown signal recieved")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	<-ctx.Done()
+	log.Println("Shutdown signal received")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := app.ShutdownWithContext(ctx); err != nil {
-		log.Printf("Shutdown error %+v\n", err)
+	if err := app.ShutdownWithContext(shutdownCtx); err != nil {
+		log.Printf("shutdown error %+v\n", err)
 	}
 }
