@@ -7,7 +7,7 @@ import (
 )
 
 type Postgres struct {
-	pool *pgxpool.Pool
+	Pool *pgxpool.Pool
 }
 
 func NewPool(ctx context.Context, connectionString string) (*Postgres, error) {
@@ -16,6 +16,10 @@ func NewPool(ctx context.Context, connectionString string) (*Postgres, error) {
 		return nil, err
 	}
 	return &Postgres{
-		pool: conn,
+		Pool: conn,
 	}, nil
+}
+
+func (p *Postgres) Close() {
+	p.Pool.Close()
 }
