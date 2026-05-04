@@ -89,7 +89,6 @@ func (s *AuthService) SignIn(ctx context.Context, input LoginInput) (string, str
 		return "", "", err
 	}
 
-	// сохраняем refresh в БД
 	err = s.sessions.CreateSession(ctx, user.ID, refresh, time.Now().Add(7*24*time.Hour))
 	if err != nil {
 		return "", "", err
