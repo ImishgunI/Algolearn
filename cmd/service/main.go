@@ -24,11 +24,15 @@ func main() {
 	}
 	defer psql.Close()
 
-	repo := userauth.NewReg(psql)
-	service := auth.NewService(repo)
-	handler := http.NewRegistration(service)
+	repo := userauth.NewRepo(psql)
 
-	app := transport.Routes(handler)
+	service := auth.NewService(repo)
+
+	regHandler := http.NewRegistration(service)
+
+	authHandler := http.NewAuthorization(service)
+
+	app := transport.Routes(regHandler, authHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
