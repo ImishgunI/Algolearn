@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"Algolearn/internal/auth"
+	"Algolearn/internal/execution/manager"
 	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
 	"Algolearn/internal/infrastructure/db/userauth"
@@ -34,7 +35,10 @@ func main() {
 
 	authHandler := http.NewAuthorization(service)
 
-	app := transport.Routes(regHandler, authHandler)
+	execManager := manager.New()
+	execHandler := http.NewExecutionHandler(execManager)
+
+	app := transport.Routes(regHandler, authHandler, execHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
