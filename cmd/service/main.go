@@ -10,6 +10,7 @@ import (
 	"Algolearn/internal/auth"
 	"Algolearn/internal/execution/manager"
 	"Algolearn/internal/execution/storage"
+	"Algolearn/internal/execution/worker"
 	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
 	"Algolearn/internal/infrastructure/db/userauth"
@@ -44,6 +45,10 @@ func main() {
 	storage := storage.New(rdb)
 	execManager := manager.New(storage)
 	execHandler := http.NewExecutionHandler(execManager)
+
+	worker := worker.New(storage)
+
+	go worker.Start(ctx)
 
 	app := transport.Routes(regHandler, authHandler, execHandler)
 
