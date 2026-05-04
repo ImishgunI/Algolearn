@@ -43,3 +43,16 @@ func (s *Storage) GetSteps(ctx context.Context, execID string) ([]state.Step, er
 
 	return steps, nil
 }
+
+func (s *Storage) Enqueue(ctx context.Context, payload string) error {
+	return s.rdb.LPush(ctx, "execution_queue", payload).Err()
+}
+
+func (s *Storage) Dequeue(ctx context.Context) (string, error) {
+	res, err := s.rdb.BRPop(ctx, 0, "execution_queue").Result()
+	if err != nil {
+		return "", err
+	}
+
+	return res[1], nil
+}
