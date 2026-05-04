@@ -5,10 +5,16 @@ import (
 	"Algolearn/internal/execution/state"
 	"Algolearn/internal/execution/storage"
 	"context"
-	"fmt"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
+
+type Job struct {
+	ExecutionID string `json:"execution_id"`
+	Algorithm   string `json:"algorithm"`
+	Data        []int  `json:"data"`
+}
 
 type Manager struct {
 	algorithms map[string]algorithms.Algorithm
@@ -25,16 +31,20 @@ func New(storage *storage.Storage) *Manager {
 }
 
 func (m *Manager) Execute(ctx context.Context, algorithm string, data []int) (string, error) {
-	algo, ok := m.algorithms[algorithm]
-	if !ok {
-		return "", fmt.Errorf("unknown algorithm")
-	}
-
-	steps := algo.Run(data)
-
 	execID := uuid.New().String()
 
-	err := m.storage.SaveSteps(ctx, execID, steps)
+	job := Job{
+		ExecutionID: execID,
+		Algorithm:   algorithm,
+		Data:        data,
+	}
+
+	payload, err := json.Marshal(job)
+	if err != nil {
+		return "", err
+	}
+
+	err = m.storage.Enqueue(ctx, string(payload))
 	if err != nil {
 		return "", err
 	}
