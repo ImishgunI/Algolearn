@@ -22,7 +22,7 @@ func JWTMiddleware(secret string) fiber.Handler {
 
 		tokenStr := parts[1]
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 			return []byte(secret), nil
 		})
 
