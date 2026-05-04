@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func Routes(reg *http.Registration, auth *http.Authorization) *fiber.App {
+func Routes(reg *http.Registration, auth *http.Authorization, exec *http.ExecutionHandler) *fiber.App {
 	app := fiber.New()
 
 	app.Post("/registration", reg.SignUp)
@@ -22,5 +22,6 @@ func Routes(reg *http.Registration, auth *http.Authorization) *fiber.App {
 		})
 	})
 
+	app.Post("/execute", exec.Execute)
 	return app
 }
