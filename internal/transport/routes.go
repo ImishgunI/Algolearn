@@ -23,5 +23,6 @@ func Routes(reg *http.Registration, auth *http.Authorization, exec *http.Executi
 	})
 
 	app.Post("/execute", exec.Execute)
+	app.Get("/execution/:id", exec.Get)
 	return app
 }
