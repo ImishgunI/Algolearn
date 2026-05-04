@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"Algolearn/internal/auth"
+	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
 	"Algolearn/internal/infrastructure/db/userauth"
 	"Algolearn/internal/transport"
@@ -25,8 +26,9 @@ func main() {
 	defer psql.Close()
 
 	repo := userauth.NewRepo(psql)
+	session := sessions.NewSession(psql)
 
-	service := auth.NewService(repo)
+	service := auth.NewService(repo, session)
 
 	regHandler := http.NewRegistration(service)
 
