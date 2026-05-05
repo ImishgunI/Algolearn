@@ -11,13 +11,12 @@ import (
 	"Algolearn/internal/execution/manager"
 	"Algolearn/internal/execution/storage"
 	"Algolearn/internal/execution/worker"
+	"Algolearn/internal/infrastructure/cache"
 	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
 	"Algolearn/internal/infrastructure/db/userauth"
 	"Algolearn/internal/transport"
 	"Algolearn/internal/transport/http"
-
-	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -39,9 +38,8 @@ func main() {
 
 	authHandler := http.NewAuthorization(service)
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "redis:6379",
-	})
+	rdb := cache.NewRedisClient("redis:6379")
+	defer rdb.Close()
 	storage := storage.New(rdb)
 	execManager := manager.New(storage)
 	execHandler := http.NewExecutionHandler(execManager)
