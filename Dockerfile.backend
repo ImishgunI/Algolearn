@@ -12,7 +12,15 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /build/main ./cmd/service/
 
 FROM alpine:latest
 
-COPY --from=builder /build/main .
+WORKDIR /build
+
+RUN addgroup -S golang -g 1001 && \
+    adduser -S michael -u 1001 -G golang
+
+COPY --from=builder --chown=michael:golang /build/main /build/
+COPY --from=builder /build/main /build/
+
+USER michael
 
 EXPOSE 8000
 
