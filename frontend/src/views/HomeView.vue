@@ -1,111 +1,163 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { user, isAdmin } from "../store/user";
-import { logout } from "../api/auth";
-const router = useRouter();
+import MainLayout from "../components/MainLayout.vue";
 
-function goToVisualizer() {
-  router.push("/visualize");
-}
+const courses = [
+  { 
+    id: 1, 
+    title: "Сортировки", 
+    desc: "Bubble, Quick, Merge — почувствуй ритм алгоритмов",
+    icon: "🔄",
+    color: "#7c3aed"
+  },
+  { 
+    id: 2, 
+    title: "Графы", 
+    desc: "DFS, BFS, Dijkstra — исследуй связи",
+    icon: "🌐",
+    color: "#10b981"
+  },
+  { 
+    id: 3, 
+    title: "Деревья", 
+    desc: "BST, AVL, Red-Black — баланс и структура",
+    icon: "🌳",
+    color: "#f59e0b"
+  },
+];
 </script>
 
 <template>
-  <div class="home">
-    <div v-if="user">
-      <p>Welcome, {{ user.user_id }}</p>
-      <button v-if="isAdmin()">Create Course (Admin)</button>
-      <button @click="logout">Logout</button>
-    </div>
-
+  <MainLayout>
     <div class="hero">
-      <h1>Algorithm Visualizer</h1>
-
-      <p>
-        Учебная система для визуализации алгоритмов сортировки и структур данных.
-      </p>
-
-      <div class="buttons">
-        <button @click="goToVisualizer">Start Visualizing</button>
-        <button disabled>Login (soon)</button>
+      <h1 class="gradient-text">AlgoLearn</h1>
+      <p class="hero-subtitle">Интерактивная визуализация алгоритмов и структур данных</p>
+      <div class="hero-decoration">
+        <div class="floating-element" v-for="i in 4" :key="i"></div>
       </div>
     </div>
 
-    <div class="features">
-      <div class="card">
-        <h3>Sorting Algorithms</h3>
-        <p>Bubble, Quick, Merge и другие</p>
-      </div>
-
-      <div class="card">
-        <h3>Step-by-step</h3>
-        <p>Пошаговое выполнение алгоритмов</p>
-      </div>
-
-      <div class="card">
-        <h3>Interactive UI</h3>
-        <p>Play, pause, speed control</p>
+    <h2 class="section-title">📚 Доступные курсы</h2>
+    
+    <div class="courses-grid">
+      <div 
+        v-for="course in courses" 
+        :key="course.id" 
+        class="course-card"
+        :style="{ '--card-color': course.color }"
+      >
+        <div class="card-icon" :style="{ background: course.color + '20', color: course.color }">
+          {{ course.icon }}
+        </div>
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.desc }}</p>
+        <button class="btn btn-primary mt-auto">
+          Начать → 
+        </button>
       </div>
     </div>
-  </div>
+  </MainLayout>
 </template>
 
 <style scoped>
-.home {
-  min-height: 100vh;
-  padding: 60px;
-  font-family: sans-serif;
-  background: #0f172a;
-  color: white;
-}
-
 .hero {
+  position: relative;
   text-align: center;
-  margin-bottom: 60px;
+  padding: 60px 20px 40px;
+  overflow: hidden;
 }
 
-.hero h1 {
-  font-size: 48px;
-  margin-bottom: 10px;
+.gradient-text {
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a78bfa, #38bdf8, #a78bfa);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s ease infinite;
 }
 
-.hero p {
-  opacity: 0.7;
-  margin-bottom: 20px;
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  margin-top: 16px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-button {
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
-  background: steelblue;
-  color: white;
+.section-title {
+  margin: 20px 0 30px;
+  font-size: 2rem;
 }
 
-button:hover {
-  background: #1d4ed8;
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.features {
+.courses-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  padding-bottom: 40px;
 }
 
-.card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
+.course-card {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, var(--card-color), transparent);
+}
+
+.course-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 40px rgba(0,0,0,0.5), 0 0 30px rgba(99, 102, 241, 0.25);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.mt-auto {
+  margin-top: auto;
+  align-self: flex-start;
 }
 </style>

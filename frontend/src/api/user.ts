@@ -1,6 +1,6 @@
-import { authFetch } from "./http";
+import { http } from "./http";
 
 export async function me() {
-  const res = await authFetch("/api/me");
+  const res = await http("/api/me");
   return res.json();
 }

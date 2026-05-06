@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { authFetch } from "../api/http";
+import { http } from "../api/http";
 
 const title = ref("");
 
 async function createCourse() {
-  await authFetch("/api/admin/course", {
+  await http("/api/admin/course", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title: title.value }),

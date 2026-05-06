@@ -1,4 +1,4 @@
-import { authFetch } from "./http";
+import { http } from "./http";
 
 export async function executeAlgorithm(data: number[]) {
   const res = await fetch("/api/execute", {
@@ -16,5 +16,5 @@ export async function executeAlgorithm(data: number[]) {
 }
 
 export function getExecution(id: string) {
-  return authFetch(`/api/execution/${id}`);
+  return http(`/api/execution/${id}`);
 }

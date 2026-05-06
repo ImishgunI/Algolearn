@@ -1,11 +1,20 @@
 import { getToken } from "../utils/token";
 
-export async function authFetch(url: string, options: any = {}) {
-  return fetch(url, {
+export async function http(url: string, options: any = {}) {
+  const res = await fetch(url, {
     ...options,
     headers: {
-      ...options.headers,
-      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      ...(getToken() && {
+        Authorization: `Bearer ${getToken()}`
+      }),
     },
   });
+
+  if (!res.ok) {
+    throw new Error("API error");
+  }
+
+  return res.json();
 }

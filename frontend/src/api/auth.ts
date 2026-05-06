@@ -1,25 +1,15 @@
-import { clearToken } from "../utils/token";
-import router from "../router";
+import { http } from "./http";
 
-export async function register(data: any) {
-  return fetch("/api/register", {
+export function login(data: any) {
+  return http("/api/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
 }
 
-export async function login(data: any) {
-  const res = await fetch("/api/login", {
+export function register(data: any) {
+  return http("/api/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  return res.json();
-}
-
-export function logout() {
-  clearToken();
-  router.push("/login");
 }

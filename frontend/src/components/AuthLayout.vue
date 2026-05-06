@@ -1,27 +1,26 @@
 <template>
-  <div class="auth">
-    <div class="card">
+  <div class="auth-page">
+    <div class="auth-card">
       <slot />
     </div>
   </div>
 </template>
 
 <style scoped>
-.auth {
-  height: 100vh;
+.auth-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #0f172a;
-  font-family: sans-serif;
+  justify-content: center;
+  background: var(--bg);
 }
 
-.card {
-  width: 350px;
-  padding: 30px;
-  border-radius: 12px;
-  background: #1e293b;
-  color: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+.auth-card {
+  background: var(--surface);
+  padding: 40px 32px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 </style>
