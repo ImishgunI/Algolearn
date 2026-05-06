@@ -52,3 +52,13 @@ func (a *Authorization) Refresh(c fiber.Ctx) error {
 		"access_token": access,
 	})
 }
+
+func (h *Authorization) Me(c fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	role := c.Locals("role")
+
+	return c.JSON(fiber.Map{
+		"user_id": userID,
+		"role":    role,
+	})
+}
