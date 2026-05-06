@@ -1,3 +1,5 @@
+import { authFetch } from "./http";
+
 export async function executeAlgorithm(data: number[]) {
   const res = await fetch("/api/execute", {
     method: "POST",
@@ -13,7 +15,6 @@ export async function executeAlgorithm(data: number[]) {
   return res.json();
 }
 
-export async function getExecution(id: string) {
-  const res = await fetch(`/api/execution/${id}`);
-  return res.json();
+export function getExecution(id: string) {
+  return authFetch(`/api/execution/${id}`);
 }

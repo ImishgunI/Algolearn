@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { executeAlgorithm, getExecution } from "../api/execution";
+// import { executeAlgorithm, getExecution } from "../api/execution";
 
 type Bar = {
   value: number;

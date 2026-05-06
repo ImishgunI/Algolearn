@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import ExecutionView from "./views/ExecutionView.vue";
+import { onMounted } from "vue";
+import { fetchUser } from "./store/user";
+
+onMounted(() => {
+  fetchUser();
+});
 </script>
 
 <template>
-  <ExecutionView />
+  <router-view />
 </template>
