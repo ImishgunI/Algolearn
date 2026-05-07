@@ -19,8 +19,8 @@ async function submit() {
   loading.value = true;
   try {
     await register({
-      user_name: name.value,
-      user_surname: surname.value,
+      name: name.value,
+      surname: surname.value,
       email: email.value,
       password: password.value,
     });

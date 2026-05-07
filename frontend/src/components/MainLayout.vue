@@ -15,7 +15,6 @@ function go(path: string) {
       <div class="logo" @click="go('/')">AlgoLearn</div>
 
       <nav class="nav-links">
-        <a @click="go('/')">Главная</a>
         <a @click="go('/visualize')">Визуализатор</a>
       </nav>
 
@@ -54,6 +53,7 @@ function go(path: string) {
   align-items: center;
   padding: 0 40px;
   gap: 40px;
+  backdrop-filter: blur(12px);
 }
 
 .logo {
@@ -64,6 +64,7 @@ function go(path: string) {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
+  user-select: none;
 }
 
 .nav-links {
@@ -73,25 +74,67 @@ function go(path: string) {
 }
 
 .nav-links a {
-  color: var(--text-muted);
+  color: var(--text);
   text-decoration: none;
   transition: color 0.2s;
   cursor: pointer;
 }
 
 .nav-links a:hover {
-  color: white;
+  color: var(--primary);
 }
 
 .auth {
   margin-left: auto;
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .main-content {
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* Кнопки (можно оставить глобальными, но продублируем для автономности) */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(241, 245, 249, 0.9);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
 }
 </style>

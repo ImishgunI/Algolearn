@@ -14,8 +14,8 @@ async function submit() {
   loading.value = true;
   try {
     const res = await login({ email: email.value, password: password.value });
-    setToken(res.token);
-    router.push("/visualize");
+    setToken(res.access_token);
+    router.push("/");
   } catch (err) {
     alert("Ошибка входа");
   } finally {

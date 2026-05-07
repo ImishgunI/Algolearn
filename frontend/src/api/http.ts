@@ -16,5 +16,16 @@ export async function http(url: string, options: any = {}) {
     throw new Error("API error");
   }
 
-  return res.json();
+  if (res.status === 204 || res.status === 304) {
+    return null;
+  }
+
+  const contentType = res.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  return res.text();
 }
