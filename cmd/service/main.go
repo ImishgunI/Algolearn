@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -23,12 +24,11 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	psql, err := sql.NewPool(ctx, "")
+	psql, err := sql.NewPool(ctx, os.Getenv("POSTGRES_URL"))
 	if err != nil {
-		log.Fatalf("db error: %+v", err)
+		log.Fatalf("Не удалось создать пул: %+v", err)
 	}
 	defer psql.Close()
-
 	repo := userauth.NewRepo(psql)
 	session := sessions.NewSession(psql)
 
