@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { user, logout } from "../store/user";
 import { useRouter } from "vue-router";
+import { ref } from 'vue';
 
 const router = useRouter();
 
 function go(path: string) {
   router.push(path);
 }
+
+const username = ref(localStorage.getItem("username"))
+
 </script>
 
 <template>
@@ -25,7 +29,7 @@ function go(path: string) {
         </template>
         <template v-else>
           <button class="btn btn-secondary" @click="go('/profile')">
-            {{ user.user_name }}
+            {{ username }}
           </button>
           <button class="btn btn-danger" @click="logout">Выйти</button>
         </template>
