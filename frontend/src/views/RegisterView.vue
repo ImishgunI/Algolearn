@@ -24,6 +24,7 @@ async function submit() {
       email: email.value,
       password: password.value,
     });
+    localStorage.setItem("username", name.value)
     alert("Регистрация прошла успешно! Теперь вы можете войти.");
     router.push("/login");
   } catch (err: any) {
