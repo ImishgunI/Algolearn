@@ -2,6 +2,7 @@ package http
 
 import (
 	"Algolearn/internal/auth"
+	"log/slog"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -20,11 +21,13 @@ func (a *Authorization) SignIn(c fiber.Ctx) error {
 	var input auth.LoginInput
 
 	if err := c.Bind().Body(&input); err != nil {
+		slog.Error("Не удалось спарсить данные в input: ", "err", err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	access, refresh, err := a.service.SignIn(c.Context(), input)
 	if err != nil {
+		slog.Error("Ошибка SignIn: ", "err", err.Error())
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
@@ -40,11 +43,13 @@ func (a *Authorization) Refresh(c fiber.Ctx) error {
 	}
 
 	if err := c.Bind().Body(&body); err != nil {
+		slog.Error("Не удалось спарсить данные в body: ", "err", err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	access, err := a.service.Refresh(c.Context(), body.RefreshToken)
 	if err != nil {
+		slog.Error("Ошибка создания токена: ", "err", err)
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 

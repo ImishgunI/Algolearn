@@ -2,6 +2,7 @@ package http
 
 import (
 	"Algolearn/internal/execution/manager"
+	"log/slog"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -25,11 +26,13 @@ func (h *ExecutionHandler) Execute(c fiber.Ctx) error {
 	var req ExecuteRequest
 
 	if err := c.Bind().Body(&req); err != nil {
+		slog.Error("Не удалось спарсить данные в ExecuteRequest: ", "err", err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	execID, err := h.manager.Execute(c.Context(), req.Algorithm, req.Data)
 	if err != nil {
+		slog.Error("Ошибка Execute: ", "err", err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -43,6 +46,7 @@ func (h *ExecutionHandler) Get(c fiber.Ctx) error {
 
 	steps, err := h.manager.Get(c.Context(), execID)
 	if err != nil {
+		slog.Error("Не удалось получить steps: ", "err", err)
 		return c.SendStatus(fiber.StatusNotFound)
 	}
 

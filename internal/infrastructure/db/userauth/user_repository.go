@@ -17,7 +17,7 @@ func NewRepo(db *sql.Postgres) *Repository {
 }
 
 func (r *Repository) CreateUser(ctx context.Context, user_data *users.User) error {
-	const query = `INSERT INTO users (user_name, user_surname, email, password_hash, role)
+	const query = `INSERT INTO users (user_name, user_surname, email, password_hash, user_role)
 		VALUES ($1, $2, $3, $4, $5)`
 
 	_, err := r.p.Pool.Exec(ctx, query,
@@ -30,7 +30,7 @@ func (r *Repository) CreateUser(ctx context.Context, user_data *users.User) erro
 }
 
 func (r *Repository) GetByEmail(ctx context.Context, email string) (*users.User, error) {
-	const query = `SELECT id, first_name, last_name, email, password_hash, role
+	const query = `SELECT id, user_name, user_surname, email, password_hash, user_role
 					FROM users
 					WHERE email = $1`
 	var user_info users.User
@@ -42,7 +42,7 @@ func (r *Repository) GetByEmail(ctx context.Context, email string) (*users.User,
 }
 
 func (r *Repository) GetByID(ctx context.Context, id int) (*users.User, error) {
-	const query = `SELECT id, first_name, last_name, email, password_hash, role
+	const query = `SELECT id, user_name, user_surname, email, password_hash, user_role
 					FROM users
 					WHERE id = $1`
 	var user_info users.User

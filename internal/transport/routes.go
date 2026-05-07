@@ -6,19 +6,20 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 )
 
 func Routes(reg *http.Registration, auth *http.Authorization, exec *http.ExecutionHandler) *fiber.App {
 	app := fiber.New()
+	app.Use(logger.New())
 	app.Use(cors.New())
-	api := app.Group("/api")
-	api.Post("/register", reg.SignUp)
-	api.Post("/login", auth.SignIn)
-	api.Post("/refresh", auth.Refresh)
+	app.Post("/register", reg.SignUp)
+	app.Post("/login", auth.SignIn)
+	app.Post("/refresh", auth.Refresh)
 
-	api.Get("/me", middleware.JWTMiddleware("secret"), auth.Me)
+	app.Get("/me", middleware.JWTMiddleware("secret"), auth.Me)
 
-	api.Post("/execute", exec.Execute)
-	api.Get("/execution/:id", exec.Get)
+	app.Post("/execute", exec.Execute)
+	app.Get("/execution/:id", exec.Get)
 	return app
 }
