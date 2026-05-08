@@ -1,6 +1,6 @@
 import { getToken } from "../utils/token";
 
-export function requireAuth(next: any) {
+export function requireAuth(_to: any, _from: any, next: any) {
   if (!getToken()) {
     next("/login");
   } else {

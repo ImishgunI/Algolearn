@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue";
-import { executeAlgorithm } from "../api/execution";
+import { executeAlgorithm, getExecution } from "../api/execution";
 
 type Bar = {
   value: number;
@@ -32,7 +32,8 @@ async function runAlgorithm() {
   try {
     const numbers = input.value.split(",").map(n => Number(n.trim()));
     const response = await executeAlgorithm(numbers);
-    steps.value = response.steps || [];
+    const ans = await getExecution(response.execution_id)
+    steps.value = ans.steps || [];
     currentStep.value = 0;
   } catch (err) {
     alert("Ошибка при запуске алгоритма");

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { user, logout } from "../store/user";
+import { user } from "../store/user";
 import { useRouter } from "vue-router";
-import { ref } from 'vue';
-
 const router = useRouter();
 
 function go(path: string) {
-  router.push(path);
+  try {
+    router.push(path);
+  } catch (e) {
+    console.error(e);
+  }
 }
-
-const username = ref(localStorage.getItem("username"))
-
 </script>
 
 <template>
@@ -29,9 +28,8 @@ const username = ref(localStorage.getItem("username"))
         </template>
         <template v-else>
           <button class="btn btn-secondary" @click="go('/profile')">
-            {{ username }}
+            {{ user.user_name }}
           </button>
-          <button class="btn btn-danger" @click="logout">Выйти</button>
         </template>
       </div>
     </header>
@@ -124,21 +122,12 @@ const username = ref(localStorage.getItem("username"))
 }
 
 .btn-secondary {
-  background: rgba(241, 245, 249, 0.9);
+  background: rgba(197, 201, 205, 0.9);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
   background: #e2e8f0;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
 }
 </style>

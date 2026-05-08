@@ -5,6 +5,7 @@ import LoginView from "../views/LoginView.vue";
 import { requireAuth } from "./guards";
 import RegisterView from "../views/RegisterView.vue";
 import AdminView from "../views/AdminView.vue";
+import ProfileView from "../views/ProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +13,7 @@ const router = createRouter({
     { path: "/", component: HomeView },
     { path: "/login", component: LoginView },
     { path: "/register", component: RegisterView },
-
+    { path: "/profile", component: ProfileView },
     {
       path: "/visualize",
       component: ExecutionView,

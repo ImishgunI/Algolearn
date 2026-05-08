@@ -1,18 +1,13 @@
 import { http } from "./http";
 
 export async function executeAlgorithm(data: number[]) {
-  const res = await fetch("/api/execute", {
+   return http('/api/execute', {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       algorithm: "bubble_sort",
-      data,
-    }),
-  });
-
-  return res.json();
+      data: data,
+    })
+   })
 }
 
 export function getExecution(id: string) {

@@ -20,7 +20,7 @@ export async function http(url: string, options: any = {}) {
     return null;
   }
 
-  const contentType = res.headers.get("content-type") || "";
+  const contentType = res.headers.get("Content-Type") || "";
 
   if (contentType.includes("application/json")) {
     const text = await res.text();
