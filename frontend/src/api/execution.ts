@@ -1,10 +1,10 @@
 import { http } from "./http";
 
-export async function executeAlgorithm(data: number[]) {
+export async function executeAlgorithm(algorithm_name: string, data: number[]) {
    return http('/api/execute', {
     method: "POST",
     body: JSON.stringify({
-      algorithm: "bubble_sort",
+      algorithm: algorithm_name,
       data: data,
     })
    })

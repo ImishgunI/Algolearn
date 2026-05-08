@@ -21,6 +21,7 @@ const isPlaying = ref(false);
 const speed = ref(600);
 const isLoading = ref(false);
 const algorithmName = ref("Bubble Sort");
+const selectedAlgorithm = ref("bubble_sort")
 
 let interval: number | null = null;
 
@@ -31,7 +32,7 @@ async function runAlgorithm() {
 
   try {
     const numbers = input.value.split(",").map(n => Number(n.trim()));
-    const response = await executeAlgorithm(numbers);
+    const response = await executeAlgorithm(selectedAlgorithm.value, numbers);
     const ans = await getExecution(response.execution_id);
     
     const rawSteps = ans.steps || [];
@@ -96,6 +97,16 @@ onUnmounted(() => pause());
 
     <!-- Панель управления -->
     <div class="controls-panel glass">
+      <select v-model="selectedAlgorithm">
+        <option value="bubble_sort">Bubble Sort</option>
+        <option value="quick_sort">Quick Sort</option>
+        <option value="merge_sort">Merge Sort</option>
+        <option value="bfs">Breadth-First Search</option>
+        <option value="dfs">Depth-First Search</option>
+        <option value="binary_search">Binary Search</option>
+        <option value="dijkstra">Dijkstra</option>
+        <option value="sliding_window">Sliding Window</option>
+      </select>
       <div class="input-group">
         <div class="input-wrapper">
           <span class="input-icon">🔢</span>
