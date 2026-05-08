@@ -32,8 +32,18 @@ async function runAlgorithm() {
   try {
     const numbers = input.value.split(",").map(n => Number(n.trim()));
     const response = await executeAlgorithm(numbers);
-    const ans = await getExecution(response.execution_id)
-    steps.value = ans.steps || [];
+    const ans = await getExecution(response.execution_id);
+    
+    const rawSteps = ans.steps || [];
+    steps.value = rawSteps.map((step: any) => ({
+      bars: step.array.map((value: number, index: number) => ({
+        value,
+        id: index,
+      })),
+      active: step.active || [],
+      swapping: step.swapping || [],
+      comparing: step.comparing || [],
+    }));
     currentStep.value = 0;
   } catch (err) {
     alert("Ошибка при запуске алгоритма");
@@ -128,7 +138,7 @@ onUnmounted(() => pause());
           <div
             class="bar"
             :class="getBarClass(index)"
-            :style="{ height: bar.value * 20 + 'px' }"
+            :style="{ height: Math.min(bar.value * 20, 360) + 'px' }"
           >
             <span class="bar-value">{{ bar.value }}</span>
           </div>
@@ -304,6 +314,7 @@ onUnmounted(() => pause());
   font-size: 14px;
   color: white;
   text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  min-height: 50px;
 }
 
 .bar.active {
