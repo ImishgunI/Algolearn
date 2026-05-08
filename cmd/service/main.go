@@ -38,7 +38,7 @@ func main() {
 
 	authHandler := http.NewAuthorization(service)
 
-	rdb := cache.NewRedisClient("redis:6379")
+	rdb := cache.NewRedisClient("redis:6379", os.Getenv("REDIS_PASSWORD"))
 	defer rdb.Close()
 	storage := storage.New(rdb)
 	execManager := manager.New(storage)

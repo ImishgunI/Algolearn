@@ -131,3 +131,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (string,
 
 	return s.createAccessToken(user)
 }
+
+func (s *AuthService) GetByID(ctx context.Context, id int) (*users.User, error) {
+	return s.repo.GetByID(ctx, id)
+}

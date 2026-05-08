@@ -60,10 +60,15 @@ func (a *Authorization) Refresh(c fiber.Ctx) error {
 
 func (h *Authorization) Me(c fiber.Ctx) error {
 	userID := c.Locals("user_id")
-	role := c.Locals("role")
-
+	user, err := h.service.GetByID(c.Context(), int(userID.(int)))
+	if err != nil {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
 	return c.JSON(fiber.Map{
-		"user_id": userID,
-		"role":    role,
+		"user_id":      user.ID,
+		"user_name":    user.Name,
+		"user_surname": user.Surname,
+		"email":        user.Email,
+		"role":         user.Role,
 	})
 }
