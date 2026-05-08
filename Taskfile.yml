@@ -1,0 +1,14 @@
+version: '3'
+
+tasks:
+  run:
+    cmds:
+      - sudo docker compose up
+
+  build:
+    cmds:
+      - cd frontend && bun run build && cd ..
+  
+  stop: 
+    cmds:
+      - sudo docker compose down
