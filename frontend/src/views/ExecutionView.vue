@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
+import { ref, computed, onUnmounted } from "vue";
 import { executeAlgorithm, getExecution } from "../api/execution";
-
-type Bar = {
-  value: number;
-  id: number;
-};
-
-type Step = {
-  bars: Bar[];
-  active: number[];
-  swapping: number[];
-  comparing?: number[];
-};
+import CodeBlock from "../components/CodeBlock.vue";
+import BubbleSortVisualizer from "../components/visualizers/BubbleSortVisualizer.vue";
+import QuickSortVisualizer from "../components/visualizers/QuickSortVisualizer.vue";
+import MergeSortVisualizer from "../components/visualizers/MergeSortVisualizer.vue";
+import { algorithmRegistry } from "../algorithmCodes";
+import type { SortStep, GraphStep, Step } from "../types/execution"
 
 const input = ref("5, 3, 1, 8, 4, 2, 7");
 const steps = ref<Step[]>([]);
@@ -20,9 +14,17 @@ const currentStep = ref(0);
 const isPlaying = ref(false);
 const speed = ref(600);
 const isLoading = ref(false);
-const algorithmName = ref("Bubble Sort");
-const selectedAlgorithm = ref("bubble_sort")
+const selectedAlgorithm = ref("bubble_sort");
 
+const algorithmMeta = computed(() => algorithmRegistry[selectedAlgorithm.value]);
+const algorithmType = computed(() => algorithmMeta.value?.type || "other");
+const currentCode = computed(() => algorithmMeta.value?.code || []);
+const currentStepLines = computed(() => {
+  const step = steps.value[currentStep.value];
+  return step?.lines || [];
+});
+
+// ---------- Анимация ----------
 let interval: number | null = null;
 
 async function runAlgorithm() {
@@ -32,19 +34,35 @@ async function runAlgorithm() {
 
   try {
     const numbers = input.value.split(",").map(n => Number(n.trim()));
+    console.log(selectedAlgorithm.value)
     const response = await executeAlgorithm(selectedAlgorithm.value, numbers);
     const ans = await getExecution(response.execution_id);
-    
+
     const rawSteps = ans.steps || [];
-    steps.value = rawSteps.map((step: any) => ({
-      bars: step.array.map((value: number, index: number) => ({
-        value,
-        id: index,
-      })),
-      active: step.active || [],
-      swapping: step.swapping || [],
-      comparing: step.comparing || [],
-    }));
+
+    if (algorithmType.value === "sort") {
+      steps.value = rawSteps.map((step: any): SortStep => ({
+        type: "sort",
+        bars: step.array.map((value: number, index: number) => ({
+          value,
+          id: index,
+        })),
+        active: step.active || [],
+        swapping: step.swapping || [],
+        lines: step.lines || [],
+      }));
+    } else if (algorithmType.value === "graph") {
+      steps.value = rawSteps.map((step: any): GraphStep => ({
+        type: "graph",
+        graph: step.graph || { nodes: [], edges: [] },
+        activeNodes: step.activeNodes || [],
+        visitedNodes: step.visitedNodes || [],
+        lines: step.lines || [],
+      }));
+    } else {
+      steps.value = [];
+    }
+
     currentStep.value = 0;
   } catch (err) {
     alert("Ошибка при запуске алгоритма");
@@ -76,15 +94,6 @@ function reset() {
   currentStep.value = 0;
 }
 
-function getBarClass(index: number) {
-  const step = steps.value[currentStep.value];
-  if (!step) return "";
-  if (step.swapping.includes(index)) return "swapping";
-  if (step.active.includes(index)) return "active";
-  if (step.comparing?.includes(index)) return "comparing";
-  return "";
-}
-
 onUnmounted(() => pause());
 </script>
 
@@ -92,33 +101,30 @@ onUnmounted(() => pause());
   <div class="visualizer-page">
     <div class="header">
       <h1>⚡ Визуализатор алгоритмов</h1>
-      <p class="subtitle">Введи числа через запятую и наблюдай за магией сортировки</p>
+      <p class="subtitle">Введи числа через запятую и наблюдай за магией</p>
     </div>
 
     <!-- Панель управления -->
     <div class="controls-panel glass">
-      <select v-model="selectedAlgorithm">
-        <option value="bubble_sort">Bubble Sort</option>
-        <option value="quick_sort">Quick Sort</option>
-        <option value="merge_sort">Merge Sort</option>
-        <option value="bfs">Breadth-First Search</option>
-        <option value="dfs">Depth-First Search</option>
-        <option value="binary_search">Binary Search</option>
-        <option value="dijkstra">Dijkstra</option>
-        <option value="sliding_window">Sliding Window</option>
+      <select v-model="selectedAlgorithm" class="algo-select">
+        <option v-for="(_, key) in algorithmRegistry" :key="key" :value="key">
+          {{ algorithmRegistry[key].displayName || key }}
+        </option>
       </select>
-      <div class="input-group">
+
+      <div class="input-group" v-if="algorithmType === 'sort'">
         <div class="input-wrapper">
           <span class="input-icon">🔢</span>
-          <input 
-            v-model="input" 
-            placeholder="5, 3, 1, 8, 4, 2, 7"
-            @keyup.enter="runAlgorithm"
-          />
+          <input v-model="input" placeholder="5, 3, 1, 8, 4, 2, 7" @keyup.enter="runAlgorithm" />
         </div>
         <button class="btn btn-primary" @click="runAlgorithm" :disabled="isLoading">
           <span v-if="!isLoading">Запустить</span>
           <span v-else class="spinner"></span>
+        </button>
+      </div>
+      <div v-else class="input-group">
+        <button class="btn btn-primary" @click="runAlgorithm" :disabled="isLoading">
+          Запустить алгоритм
         </button>
       </div>
 
@@ -131,52 +137,48 @@ onUnmounted(() => pause());
       </div>
     </div>
 
-    <!-- Визуализация -->
-    <div v-if="steps.length" class="visualization glass">
-      <div class="info-bar">
-        <div class="step-counter">
-          <span class="badge">Шаг {{ currentStep }} / {{ steps.length - 1 }}</span>
-          <span class="algo-badge">{{ algorithmName }}</span>
-        </div>
-      </div>
+      <!-- Визуализация -->
+    <BubbleSortVisualizer
+      v-if="selectedAlgorithm === 'bubble_sort'"
+      :steps="(steps as SortStep[])"
+      :currentStep="currentStep"
+    />
 
-      <div class="bars-container">
-        <div
-          v-for="(bar, index) in steps[currentStep]?.bars || []"
-          :key="bar.id"
-          class="bar-wrapper"
-        >
-          <div
-            class="bar"
-            :class="getBarClass(index)"
-            :style="{ height: Math.min(bar.value * 20, 360) + 'px' }"
-          >
-            <span class="bar-value">{{ bar.value }}</span>
-          </div>
-          <div class="bar-index">{{ index }}</div>
-        </div>
-      </div>
+    <QuickSortVisualizer
+      v-else-if="selectedAlgorithm === 'quick_sort'"
+      :steps="(steps as SortStep[])"
+      :currentStep="currentStep"
+    />
 
-      <div class="playback-controls">
-        <button @click="reset" class="btn btn-secondary">↺ Сброс</button>
-        <button 
-          @click="isPlaying ? pause() : play()" 
-          class="btn btn-primary play-btn"
-        >
-          <span v-if="!isPlaying">▶ Анимировать</span>
-          <span v-else>⏸ Пауза</span>
-        </button>
-        <div class="step-nav">
-          <button class="btn btn-secondary" @click="currentStep = Math.max(0, currentStep-1)">←</button>
-          <button class="btn btn-secondary" @click="currentStep = Math.min(steps.length-1, currentStep+1)">→</button>
-        </div>
-      </div>
+    <MergeSortVisualizer
+      v-else-if="selectedAlgorithm === 'merge_sort'"
+      :steps="(steps as SortStep[])"
+      :currentStep="currentStep"
+    />
+
+    <!-- <GraphVisualizer
+      v-else-if="algorithmType === 'graph' && currentStepData?.type === 'graph'"
+      :steps="(steps as GraphStep[])"
+      :currentStep="currentStep"
+    /> -->
+
+    <!-- Блок кода -->
+    <div v-if="currentCode.length" class="code-section">
+      <h3>Исходный код</h3>
+      <CodeBlock :codeLines="currentCode" :activeLines="currentStepLines" />
     </div>
 
-    <!-- Плейсхолдер -->
-    <div v-else class="placeholder glass">
-      <div class="placeholder-icon">📊</div>
-      <p>Введи числа и нажми «Запустить», чтобы увидеть анимацию сортировки</p>
+      <!-- Управление плеером -->
+    <div class="playback-controls">
+      <button @click="reset" class="btn btn-secondary">↺ Сброс</button>
+      <button @click="isPlaying ? pause() : play()" class="btn btn-primary play-btn">
+        <span v-if="!isPlaying">▶ Анимировать</span>
+        <span v-else>⏸ Пауза</span>
+      </button>
+      <div class="step-nav">
+        <button class="btn btn-secondary" @click="currentStep = Math.max(0, currentStep - 1)">←</button>
+        <button class="btn btn-secondary" @click="currentStep = Math.min(steps.length - 1, currentStep + 1)">→</button>
+      </div>
     </div>
   </div>
 </template>
@@ -292,64 +294,6 @@ onUnmounted(() => pause());
   font-weight: 600;
 }
 
-.bars-container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 10px;
-  height: 400px;
-  padding: 20px 10px 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-sm);
-  position: relative;
-}
-
-.bar-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 44px;
-}
-
-.bar {
-  width: 100%;
-  background: linear-gradient(180deg, #818cf8, #6366f1);
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.4);
-  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, box-shadow 0.3s;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 8px;
-  font-weight: 700;
-  font-size: 14px;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-  min-height: 50px;
-}
-
-.bar.active {
-  background: linear-gradient(180deg, #fbbf24, #d97706);
-  box-shadow: 0 -4px 20px rgba(245, 158, 11, 0.6);
-}
-
-.bar.swapping {
-  background: linear-gradient(180deg, #f87171, #dc2626);
-  box-shadow: 0 -4px 20px rgba(239, 68, 68, 0.6);
-  transform: scale(1.05);
-}
-
-.bar.comparing {
-  background: linear-gradient(180deg, #34d399, #059669);
-  box-shadow: 0 -4px 20px rgba(16, 185, 129, 0.6);
-}
-
-.bar-index {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
 .playback-controls {
   display: flex;
   gap: 16px;
@@ -391,6 +335,34 @@ onUnmounted(() => pause());
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   display: inline-block;
+}
+
+.algo-select {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+
+.algo-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.code-section {
+  margin-top: 24px;
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+}
+
+.code-section h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
