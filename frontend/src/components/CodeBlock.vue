@@ -1,0 +1,150 @@
+<script setup lang="ts">
+import hljs from "highlight.js/lib/core";
+import go from "highlight.js/lib/languages/go";
+
+hljs.registerLanguage("go", go);
+
+const props = defineProps<{
+  codeLines: string[];
+  activeLines: number[];
+}>();
+
+function highlight(line: string) {
+  return hljs.highlight(line, {
+    language: "go",
+  }).value;
+}
+</script>
+
+<template>
+  <div class="code-block">
+    <div
+      v-for="(line, index) in codeLines"
+      :key="index"
+      class="code-line"
+      :class="{
+        active: activeLines.includes(index + 1)
+      }"
+    >
+      <div class="line-number">
+        {{ index + 1 }}
+      </div>
+
+      <pre class="line-code">
+        <code v-html="highlight(line)" />
+      </pre>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.code-block {
+  background: #0f172a;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    monospace;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.code-line {
+  display: flex;
+  align-items: stretch;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+
+  border-left: 3px solid transparent;
+}
+
+.code-line:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.code-line.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-left-color: #6366f1;
+}
+
+.line-number {
+  width: 52px;
+
+  flex-shrink: 0;
+
+  padding:
+    0.65rem
+    0.75rem;
+
+  text-align: right;
+
+  color: #64748b;
+
+  background: rgba(255,255,255,0.03);
+
+  border-right: 1px solid rgba(255,255,255,0.05);
+
+  user-select: none;
+}
+
+.line-code {
+  margin: 0;
+
+  flex: 1;
+
+  overflow-x: auto;
+
+  padding:
+    0.65rem
+    1rem;
+
+  color: #e2e8f0;
+
+  background: transparent;
+}
+
+.line-code code {
+  background: transparent !important;
+}
+
+/* ---------- highlight.js overrides ---------- */
+
+:deep(.hljs-keyword) {
+  color: #c084fc;
+}
+
+:deep(.hljs-string) {
+  color: #86efac;
+}
+
+:deep(.hljs-number) {
+  color: #fca5a5;
+}
+
+:deep(.hljs-title) {
+  color: #7dd3fc;
+}
+
+:deep(.hljs-function) {
+  color: #7dd3fc;
+}
+
+:deep(.hljs-params) {
+  color: #e2e8f0;
+}
+
+:deep(.hljs-comment) {
+  color: #64748b;
+  font-style: italic;
+}
+
+:deep(.hljs-built_in) {
+  color: #facc15;
+}
+</style>
