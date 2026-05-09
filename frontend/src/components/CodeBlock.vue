@@ -30,9 +30,9 @@ function highlight(line: string) {
         {{ index + 1 }}
       </div>
 
-      <pre class="line-code">
+      <div class="line-code">
         <code v-html="highlight(line)" />
-      </pre>
+      </div>
     </div>
   </div>
 </template>
@@ -43,24 +43,14 @@ function highlight(line: string) {
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.06);
-
-  font-family:
-    "JetBrains Mono",
-    "Fira Code",
-    monospace;
-
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 13px;
 }
 
 .code-line {
   display: flex;
-  align-items: stretch;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
-
+  align-items: center;
+  transition: background 0.2s ease, border-left-color 0.2s ease;
   border-left: 3px solid transparent;
 }
 
@@ -74,77 +64,36 @@ function highlight(line: string) {
 }
 
 .line-number {
-  width: 52px;
-
+  width: 48px;
   flex-shrink: 0;
-
-  padding:
-    0.65rem
-    0.75rem;
-
+  padding-right: 12px;
   text-align: right;
-
   color: #64748b;
-
   background: rgba(255,255,255,0.03);
-
   border-right: 1px solid rgba(255,255,255,0.05);
-
   user-select: none;
 }
 
 .line-code {
-  margin: 0;
-
   flex: 1;
-
-  overflow-x: auto;
-
-  padding:
-    0.65rem
-    1rem;
-
+  display: flex;
+  padding-left: 8px;
   color: #e2e8f0;
-
-  background: transparent;
+  white-space: pre;
 }
 
 .line-code code {
+  display: block;
+  line-height: 1;
   background: transparent !important;
 }
 
-/* ---------- highlight.js overrides ---------- */
-
-:deep(.hljs-keyword) {
-  color: #c084fc;
-}
-
-:deep(.hljs-string) {
-  color: #86efac;
-}
-
-:deep(.hljs-number) {
-  color: #fca5a5;
-}
-
-:deep(.hljs-title) {
-  color: #7dd3fc;
-}
-
-:deep(.hljs-function) {
-  color: #7dd3fc;
-}
-
-:deep(.hljs-params) {
-  color: #e2e8f0;
-}
-
-:deep(.hljs-comment) {
-  color: #64748b;
-  font-style: italic;
-}
-
-:deep(.hljs-built_in) {
-  color: #facc15;
-}
+/* Highlight.js */
+:deep(.hljs-keyword) { color: #c084fc; }
+:deep(.hljs-string) { color: #86efac; }
+:deep(.hljs-number) { color: #fca5a5; }
+:deep(.hljs-title) { color: #7dd3fc; }
+:deep(.hljs-function) { color: #7dd3fc; }
+:deep(.hljs-comment) { color: #64748b; font-style: italic; }
+:deep(.hljs-built_in) { color: #facc15; }
 </style>
