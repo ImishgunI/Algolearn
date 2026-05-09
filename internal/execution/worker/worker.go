@@ -18,6 +18,8 @@ func New(storage *storage.Storage) *Worker {
 		storage: storage,
 		algorithms: map[string]algorithms.Algorithm{
 			"bubble_sort": &algorithms.BubbleSort{},
+			"quick_sort":  &algorithms.QuickSort{},
+			"merge_sort":  &algorithms.MergeSort{},
 		},
 	}
 }
