@@ -25,7 +25,7 @@ func (b *BubbleSort) Run(input []int) []state.Step {
 					Array:    copyArray(arr),
 					Active:   []int{},
 					Swapping: []int{j, j + 1},
-					Lines:    []int{4},
+					Lines:    []int{4, 5},
 				})
 			}
 		}
