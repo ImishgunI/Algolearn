@@ -6,6 +6,8 @@ import { requireAuth } from "./guards";
 import RegisterView from "../views/RegisterView.vue";
 import AdminView from "../views/AdminView.vue";
 import ProfileView from "../views/ProfileView.vue";
+import SortingCourse from "../views/SortingCourse.vue";
+import LessonView from "../views/LessonView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -23,7 +25,22 @@ const router = createRouter({
       path: "/admin",
       component: AdminView,
       beforeEnter: requireAuth,
-    }
+    }, 
+    {
+      path: "/courses/sorting",
+      component: SortingCourse,
+      children: [
+        {
+          path: ":lessonId",
+          component: LessonView,
+          props: true,
+        },
+        {
+          path: "",
+          redirect: "/courses/sorting/intro",
+        },
+      ],
+    },
   ]
 });
 
