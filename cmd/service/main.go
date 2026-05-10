@@ -13,6 +13,9 @@ import (
 	"Algolearn/internal/execution/storage"
 	"Algolearn/internal/execution/worker"
 	"Algolearn/internal/infrastructure/cache"
+	"Algolearn/internal/infrastructure/db/comment"
+	"Algolearn/internal/infrastructure/db/favorite"
+	"Algolearn/internal/infrastructure/db/lesson"
 	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
 	"Algolearn/internal/infrastructure/db/userauth"
@@ -43,12 +46,18 @@ func main() {
 	storage := storage.New(rdb)
 	execManager := manager.New(storage)
 	execHandler := http.NewExecutionHandler(execManager)
+	lessonRepo := lesson.NewLessonRepo(psql)
+	lessonHandler := http.NewLessonHandler(lessonRepo)
+	commentRepo := comment.NewCommentRepository(psql)
+	commentHandler := http.NewCommentHandler(commentRepo, repo)
+	favRepo := favorite.NewFavoriteRepo(psql)
+	favoriteHandler := http.NewFavoriteHandler(favRepo)
 
 	worker := worker.New(storage)
 
 	go worker.Start(ctx)
 
-	app := transport.Routes(regHandler, authHandler, execHandler)
+	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
