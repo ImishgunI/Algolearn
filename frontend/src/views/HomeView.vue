@@ -1,50 +1,61 @@
 <script setup lang="ts">
 import MainLayout from "../components/MainLayout.vue";
-
+import { useRouter } from "vue-router";
+const router = useRouter();
 const courses = [
-  { 
-    id: 1, 
-    title: "Сортировки", 
+  {
+    id: 1,
+    title: "Сортировки",
     desc: "Bubble, Quick, Merge",
     icon: "🔄",
-    color: "#7c3aed"
+    color: "#7c3aed",
+    route: "/courses/sorting"   // реальный маршрут
   },
-  { 
-    id: 2, 
-    title: "Графы", 
+  {
+    id: 2,
+    title: "Графы",
     desc: "DFS, BFS, Dijkstra",
     icon: "🌐",
-    color: "#10b981"
+    color: "#10b981",
+    route: "/courses/graphs"     // пока заглушка
   },
-  { 
-    id: 3, 
-    title: "Деревья", 
+  {
+    id: 3,
+    title: "Деревья",
     desc: "BST, AVL, Red-Black",
     icon: "🌳",
-    color: "#f59e0b"
+    color: "#f59e0b",
+    route: "/courses/trees"
   },
   {
     id: 4,
     title: "Поиск",
     desc: "Линейный, бинарный",
     icon: "🔍",
-    color: "#6366f1"
+    color: "#6366f1",
+    route: "/courses/search"
   },
   {
     id: 5,
     title: "Два указателя",
     desc: "Эффективные техники работы с массивами",
     icon: "⬆️",
-    color: "#14b8a6"
+    color: "#14b8a6",
+    route: "/courses/two-pointers"
   },
   {
     id: 6,
     title: "Связный список",
     desc: "Односвязный, двусвязный, циклы и развороты",
     icon: "⛓️",
-    color: "#8b5cf6"
+    color: "#8b5cf6",
+    route: "/courses/linked-list"
   },
 ];
+
+function openCourse(route: string) {
+  router.push(route);
+}
 </script>
 
 <template>
@@ -71,7 +82,7 @@ const courses = [
         </div>
         <h3>{{ course.title }}</h3>
         <p>{{ course.desc }}</p>
-        <button class="btn btn-primary mt-auto">
+        <button class="btn btn-primary mt-auto" @click="openCourse(course.route)">
           Начать → 
         </button>
       </div>
