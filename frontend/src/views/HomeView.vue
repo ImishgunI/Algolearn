@@ -38,7 +38,7 @@ const courses = [
     color: "#14b8a6"
   },
   {
-    id: 7,
+    id: 6,
     title: "Связный список",
     desc: "Односвязный, двусвязный, циклы и развороты",
     icon: "⛓️",
@@ -53,7 +53,7 @@ const courses = [
       <h1 class="gradient-text">AlgoLearn</h1>
       <p class="hero-subtitle">Интерактивная визуализация алгоритмов и структур данных</p>
       <div class="hero-decoration">
-        <div class="floating-element" v-for="i in 4" :key="i"></div>
+        <div class="floating-element" v-for="i in 3" :key="i"></div>
       </div>
     </div>
 
