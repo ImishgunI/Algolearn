@@ -118,7 +118,7 @@ onUnmounted(() => pause());
           <input v-model="input" placeholder="5, 3, 1, 8, 4, 2, 7" @keyup.enter="runAlgorithm" />
         </div>
         <button class="btn btn-primary" @click="runAlgorithm" :disabled="isLoading">
-          <span v-if="!isLoading">Запустить</span>
+          <span v-if="!isLoading">Начать</span>
           <span v-else class="spinner"></span>
         </button>
       </div>

@@ -38,8 +38,7 @@ async function submit() {
   <AuthLayout>
     <div class="auth-card glass">
       <div class="logo">🚀</div>
-      <h2>Присоединяйся</h2>
-      <p class="subtitle">Начни визуализировать алгоритмы</p>
+      <h2>Регистрация</h2>
 
       <form @submit.prevent="submit">
         <div class="row">
