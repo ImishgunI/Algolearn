@@ -31,13 +31,9 @@ const router = createRouter({
       component: SortingCourse,
       children: [
         {
-          path: ":lessonId",
+          path: ":lessonId(\\d+)",
           component: LessonView,
           props: true,
-        },
-        {
-          path: "",
-          redirect: "/courses/sorting/intro",
         },
       ],
     },
