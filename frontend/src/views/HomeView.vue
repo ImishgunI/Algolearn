@@ -5,28 +5,28 @@ const courses = [
   { 
     id: 1, 
     title: "Сортировки", 
-    desc: "Bubble, Quick, Merge — почувствуй ритм алгоритмов",
+    desc: "Bubble, Quick, Merge",
     icon: "🔄",
     color: "#7c3aed"
   },
   { 
     id: 2, 
     title: "Графы", 
-    desc: "DFS, BFS, Dijkstra — исследуй связи",
+    desc: "DFS, BFS, Dijkstra",
     icon: "🌐",
     color: "#10b981"
   },
   { 
     id: 3, 
     title: "Деревья", 
-    desc: "BST, AVL, Red-Black — баланс и структура",
+    desc: "BST, AVL, Red-Black",
     icon: "🌳",
     color: "#f59e0b"
   },
   {
     id: 4,
     title: "Поиск",
-    desc: "Линейный, бинарный — найди элемент в массиве",
+    desc: "Линейный, бинарный",
     icon: "🔍",
     color: "#6366f1"
   },
@@ -34,7 +34,7 @@ const courses = [
     id: 5,
     title: "Два указателя",
     desc: "Эффективные техники работы с массивами",
-    icon: "👆",
+    icon: "⬆️",
     color: "#14b8a6"
   },
   {
@@ -120,7 +120,7 @@ const courses = [
 
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 28px;
   padding-bottom: 40px;
 }
