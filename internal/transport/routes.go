@@ -9,7 +9,9 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/logger"
 )
 
-func Routes(reg *http.Registration, auth *http.Authorization, exec *http.ExecutionHandler, ls *http.LessonHandler, ch *http.CommentHandler, fh *http.FavoriteHandler) *fiber.App {
+func Routes(reg *http.Registration, auth *http.Authorization,
+	exec *http.ExecutionHandler, ls *http.LessonHandler,
+	ch *http.CommentHandler, fh *http.FavoriteHandler, ph *http.ProfileHandler) *fiber.App {
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
@@ -30,5 +32,11 @@ func Routes(reg *http.Registration, auth *http.Authorization, exec *http.Executi
 
 	app.Get("/lessons/:lessonID/favorite", middleware.JWTMiddleware("secret"), fh.Status)
 	app.Post("/lessons/:lessonID/favorite", middleware.JWTMiddleware("secret"), fh.Toggle)
+
+	app.Get("/me", middleware.JWTMiddleware("secret"), auth.Me)
+	app.Put("/profile", middleware.JWTMiddleware("secret"), ph.UpdateProfile)
+	app.Put("/profile/password", middleware.JWTMiddleware("secret"), ph.UpdatePassword)
+	app.Get("/profile/stats", middleware.JWTMiddleware("secret"), ph.GetStats)
+	app.Get("/profile/favorites", middleware.JWTMiddleware("secret"), ph.GetFavorites)
 	return app
 }

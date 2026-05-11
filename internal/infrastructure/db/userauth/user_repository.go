@@ -52,3 +52,25 @@ func (r *Repository) GetByID(ctx context.Context, id int) (*users.User, error) {
 	}
 	return &user_info, nil
 }
+
+func (r *Repository) UpdateProfile(ctx context.Context, userID int, name, surname, email string) error {
+	_, err := r.p.Pool.Exec(ctx,
+		`UPDATE users
+		SET user_name = $1, user_surname = $2, email = $3
+		WHERE user_id = $4`, name, surname, email, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) UpdatePassword(ctx context.Context, userID int, hash string) error {
+	_, err := r.p.Pool.Exec(ctx,
+		`UPDATE users
+		SET password_hash = $1
+		WHERE user_id = $2`, hash, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

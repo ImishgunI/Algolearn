@@ -2,6 +2,7 @@ package favorite
 
 import (
 	"Algolearn/internal/infrastructure/db/sql"
+	"Algolearn/internal/learning/favorite"
 	"context"
 )
 
@@ -56,4 +57,35 @@ func (r *Repository) GetUserFavorites(ctx context.Context, userID int) ([]int, e
 		ids = append(ids, id)
 	}
 	return ids, nil
+}
+
+func (r *Repository) GetFavoriteLessons(ctx context.Context, userID int) ([]favorite.LessonInfo, error) {
+	const query = `SELECT f.lesson_id, l.title FROM favorites f
+					JOIN lessons l ON f.lesson_id = l.id
+					WHERE user_id = $1`
+
+	rows, err := r.p.Pool.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var li []favorite.LessonInfo
+	for rows.Next() {
+		var l favorite.LessonInfo
+		if err := rows.Scan(&l.LessonID, &l.Title); err != nil {
+			return nil, err
+		}
+		li = append(li, l)
+	}
+	return li, nil
+}
+
+func (r *Repository) CountByUser(ctx context.Context, userID int) (int, error) {
+	const query = `SELECT COUNT(lesson_id) FROM favorites WHERE user_id = $1`
+	var count int
+	err := r.p.Pool.QueryRow(ctx, query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

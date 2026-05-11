@@ -2,6 +2,7 @@ package db
 
 import (
 	"Algolearn/internal/learning/comment"
+	"Algolearn/internal/learning/favorite"
 	"Algolearn/internal/learning/lesson"
 	"Algolearn/internal/users"
 	"context"
@@ -12,6 +13,8 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *users.User) error
 	GetByEmail(ctx context.Context, email string) (*users.User, error)
 	GetByID(ctx context.Context, id int) (*users.User, error)
+	UpdateProfile(ctx context.Context, userID int, name, surname, email string) error
+	UpdatePassword(ctx context.Context, userID int, hash string) error
 }
 
 type SessionRepository interface {
@@ -35,4 +38,6 @@ type FavoriteRepository interface {
 	Remove(ctx context.Context, userID int, lessonID int) error
 	IsFavorited(ctx context.Context, userID int, lessonID int) (bool, error)
 	GetUserFavorites(ctx context.Context, userID int) ([]int, error)
+	CountByUser(ctx context.Context, userID int) (int, error)
+	GetFavoriteLessons(ctx context.Context, userID int) ([]favorite.LessonInfo, error)
 }
