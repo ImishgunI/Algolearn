@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { user } from "../store/user";
-import { useRouter } from "vue-router";
+import { user, fetchUser } from "../store/user";
+import { useRouter, useRoute } from "vue-router";
+import { watch } from "vue";
+import { getToken } from "../utils/token";
+
 const router = useRouter();
+const route = useRoute();
+
 
 function go(path: string) {
   try {
@@ -10,6 +15,22 @@ function go(path: string) {
     console.error(e);
   }
 }
+
+watch(
+  () => route.fullPath,
+  async () => {
+    if (getToken() && !user.value) {
+      try {
+        await fetchUser();
+      } catch (e) {
+        console.error("Failed to fetch user in MainLayout:", e);
+      }
+    }
+  },
+  { immediate: true }
+);
+
+
 </script>
 
 <template>
