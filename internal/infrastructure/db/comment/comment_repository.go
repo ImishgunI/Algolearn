@@ -29,9 +29,10 @@ func (r *Repository) Create(ctx context.Context, c *comment.Comment) error {
 }
 
 func (r *Repository) GetByLesson(ctx context.Context, lessonID int) ([]comment.Comment, error) {
-	rows, err := r.p.Pool.Query(ctx, `SELECT c.id, c.user_id, u.user_name, c.body, c.created_at from comments c
+	rows, err := r.p.Pool.Query(ctx, `SELECT c.id, c.lesson_id, c.user_id, u.user_name, c.body, c.created_at from comments c
 		JOIN users u ON u.id = c.user_id
-		WHERE lesson_id = $1`, lessonID)
+		WHERE lesson_id = $1
+		ORDER BY c.created_at ASC`, lessonID)
 	if err != nil {
 		return nil, err
 	}

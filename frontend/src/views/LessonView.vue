@@ -75,7 +75,7 @@ async function handleToggleFavorite() {
         Открыть в визуализаторе
       </router-link>
       <button class="btn btn-secondary" @click="handleToggleFavorite">
-        {{ isFavorited ? '❤️ В избранном' : '🤍 Добавить в избранное' }}
+        {{ isFavorited ? '❤️ В избранном' : '❣️ Добавить в избранное' }}
       </button>
     </div>
 
@@ -86,7 +86,7 @@ async function handleToggleFavorite() {
         <button class="btn btn-primary" @click="handleAddComment">Отправить</button>
       </div>
       <div v-for="c in comments" :key="c.id" class="comment">
-        <strong>{{ c.user_name }}</strong>
+        <strong>{{ c.user_name }}&nbsp;</strong>
         <small>{{ new Date(c.created_at).toLocaleString() }}</small>
         <p>{{ c.body }}</p>
       </div>
@@ -100,7 +100,7 @@ async function handleToggleFavorite() {
 .comments-section { margin-top: 40px; }
 .comment-form { margin-bottom: 20px; }
 textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
-.comment { background: var(--surface); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+.comment { background: var(--surface); padding: 9px; border-radius: 8px; margin-bottom: 12px; }
 .btn { display: inline-block; margin: 8px 8px 0 0; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-primary { background: var(--primary); color: white; }
 .btn-secondary { background: var(--surface2, rgba(0,0,0,0.08)); color: var(--text); }
