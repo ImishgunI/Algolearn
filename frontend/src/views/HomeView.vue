@@ -1,60 +1,40 @@
 <script setup lang="ts">
 import MainLayout from "../components/MainLayout.vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
-const courses = [
-  {
-    id: 1,
-    title: "Сортировки",
-    desc: "Bubble, Quick, Merge",
-    icon: "🔄",
-    color: "#7c3aed",
-    route: "/courses/sorting"   // реальный маршрут
-  },
-  {
-    id: 2,
-    title: "Графы",
-    desc: "DFS, BFS, Dijkstra",
-    icon: "🌐",
-    color: "#10b981",
-    route: "/courses/graphs"     // пока заглушка
-  },
-  {
-    id: 3,
-    title: "Деревья",
-    desc: "BST, AVL, Red-Black",
-    icon: "🌳",
-    color: "#f59e0b",
-    route: "/courses/trees"
-  },
-  {
-    id: 4,
-    title: "Поиск",
-    desc: "Линейный, бинарный",
-    icon: "🔍",
-    color: "#6366f1",
-    route: "/courses/search"
-  },
-  {
-    id: 5,
-    title: "Два указателя",
-    desc: "Эффективные техники работы с массивами",
-    icon: "⬆️",
-    color: "#14b8a6",
-    route: "/courses/two-pointers"
-  },
-  {
-    id: 6,
-    title: "Связный список",
-    desc: "Односвязный, двусвязный, циклы и развороты",
-    icon: "⛓️",
-    color: "#8b5cf6",
-    route: "/courses/linked-list"
-  },
-];
+import { getAllCourses, type Course } from "../api/courses";
+import { ref, onMounted } from "vue";
 
-function openCourse(route: string) {
-  router.push(route);
+const router = useRouter();
+const courses = ref<Course[]>([]);
+
+// Карта иконок и цветов по ID курса (можно расширять)
+const iconMap: Record<number, string> = {
+  1: "🔄", 2: "🌐", 3: "🌳", 4: "🔍", 5: "⬆️", 6: "⛓️"
+};
+const colorMap: Record<number, string> = {
+  1: "#7c3aed", 2: "#10b981", 3: "#f59e0b", 4: "#6366f1", 5: "#14b8a6", 6: "#8b5cf6"
+};
+
+onMounted(async () => {
+  try {
+    courses.value = await getAllCourses();
+  } catch (e) {
+    console.error("Ошибка загрузки курсов:", e);
+  }
+});
+
+function getCourseIcon(courseId: number): string {
+  return iconMap[courseId] || "📘";
+}
+function getCourseColor(courseId: number): string {
+  return colorMap[courseId] || "#6366f1";
+}
+function openCourse(course: Course) {
+  if (course.id === 1) {
+    router.push("/courses/sorting");
+  } else {
+    router.push(`/courses/${course.id}`);
+  }
 }
 </script>
 
@@ -63,27 +43,30 @@ function openCourse(route: string) {
     <div class="hero">
       <h1 class="gradient-text">AlgoLearn</h1>
       <p class="hero-subtitle">Интерактивная визуализация алгоритмов и структур данных</p>
-      <div class="hero-decoration">
-        <div class="floating-element" v-for="i in 3" :key="i"></div>
-      </div>
     </div>
 
     <h2 class="section-title">📚 Доступные курсы</h2>
-    
+
     <div class="courses-grid">
-      <div 
-        v-for="course in courses" 
-        :key="course.id" 
+      <div
+        v-for="course in courses"
+        :key="course.id"
         class="course-card"
-        :style="{ '--card-color': course.color }"
+        :style="{ '--card-color': getCourseColor(course.id) }"
       >
-        <div class="card-icon" :style="{ background: course.color + '20', color: course.color }">
-          {{ course.icon }}
+        <div
+          class="card-icon"
+          :style="{
+            background: getCourseColor(course.id) + '20',
+            color: getCourseColor(course.id)
+          }"
+        >
+          {{ getCourseIcon(course.id) }}
         </div>
         <h3>{{ course.title }}</h3>
-        <p>{{ course.desc }}</p>
-        <button class="btn btn-primary mt-auto" @click="openCourse(course.route)">
-          Начать → 
+        <p>{{ course.description || '' }}</p>
+        <button class="btn btn-primary mt-auto" @click="openCourse(course)">
+          Начать →
         </button>
       </div>
     </div>

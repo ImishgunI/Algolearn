@@ -3,6 +3,7 @@ import { user, fetchUser } from "../store/user";
 import { useRouter, useRoute } from "vue-router";
 import { watch } from "vue";
 import { getToken } from "../utils/token";
+import { logout } from "../store/user";
 
 const router = useRouter();
 const route = useRoute();
@@ -48,9 +49,17 @@ watch(
           <button class="btn btn-primary" @click="go('/register')">Регистрация</button>
         </template>
         <template v-else>
-          <button class="btn btn-secondary" @click="go('/profile')">
-            {{ user.user_name }}
-          </button>
+          <!-- Администратор -->
+          <template v-if="user.role === 'admin'">
+            <button class="btn btn-secondary" @click="go('/admin')">Админ-панель</button>
+            <button class="btn btn-danger" @click="logout">Выйти</button>
+          </template>
+          <!-- Обычный пользователь -->
+          <template v-else>
+            <button class="btn btn-secondary" @click="go('/profile')">
+              {{ user.user_name }}
+            </button>
+          </template>
         </template>
       </div>
     </header>
@@ -150,5 +159,13 @@ watch(
 
 .btn-secondary:hover {
   background: #e2e8f0;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+.btn-danger:hover {
+  background: #dc2626;
 }
 </style>
