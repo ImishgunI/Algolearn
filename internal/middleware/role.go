@@ -2,14 +2,17 @@ package middleware
 
 import "github.com/gofiber/fiber/v3"
 
-func RequireRole(role string) fiber.Handler {
+func RequireRole(roles ...string) fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userRole := c.Locals("role")
-
-		if userRole == nil || userRole != role {
-			return c.SendStatus(403)
+		role, ok := c.Locals("role").(string)
+		if !ok {
+			return c.SendStatus(fiber.StatusUnauthorized)
 		}
-
-		return c.Next()
+		for _, r := range roles {
+			if role == r {
+				return c.Next()
+			}
+		}
+		return c.SendStatus(fiber.StatusForbidden)
 	}
 }
