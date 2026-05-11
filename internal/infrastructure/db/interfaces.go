@@ -7,7 +7,6 @@ import (
 	"Algolearn/internal/learning/lesson"
 	"Algolearn/internal/users"
 	"context"
-	"os/user"
 	"time"
 )
 
@@ -17,7 +16,7 @@ type UserRepository interface {
 	GetByID(ctx context.Context, id int) (*users.User, error)
 	UpdateProfile(ctx context.Context, userID int, name, surname, email string) error
 	UpdatePassword(ctx context.Context, userID int, hash string) error
-	GetAll(ctx context.Context) ([]user.User, error)
+	GetAll(ctx context.Context) ([]users.User, error)
 	UpdateRole(ctx context.Context, userID int, role string) error
 }
 
