@@ -57,6 +57,7 @@ func Routes(reg *http.Registration, auth *http.Authorization,
 	adminGroup.Get("/users", adminHandler.ListUsers)
 	adminGroup.Put("/users/:id/role", adminHandler.UpdateUserRole)
 
+	adminGroup.Get("/comments", adminHandler.ListComments)
 	adminGroup.Delete("/comments/:id", adminHandler.DeleteComment)
 
 	adminGroup.Get("/stats", adminHandler.Stats)

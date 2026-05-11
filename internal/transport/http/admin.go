@@ -198,6 +198,14 @@ func (h *AdminHandler) UpdateUserRole(c fiber.Ctx) error {
 }
 
 // Комментарии
+func (h *AdminHandler) ListComments(c fiber.Ctx) error {
+	comments, err := h.commentRepo.GetAllComments(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(comments)
+}
+
 func (h *AdminHandler) DeleteComment(c fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

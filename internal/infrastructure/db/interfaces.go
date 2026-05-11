@@ -41,6 +41,7 @@ type CommentRepository interface {
 	GetByLesson(ctx context.Context, lessonID int) ([]comment.Comment, error)
 	Delete(ctx context.Context, id int) error
 	Count(ctx context.Context) (int, error)
+	GetAllComments(ctx context.Context) ([]comment.Comment, error)
 }
 
 type FavoriteRepository interface {

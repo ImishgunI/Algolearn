@@ -65,3 +65,24 @@ func (r *Repository) Count(ctx context.Context) (int, error) {
 	}
 	return c, nil
 }
+
+func (r *Repository) GetAllComments(ctx context.Context) ([]comment.Comment, error) {
+	rows, err := r.p.Pool.Query(ctx,
+		`SELECT c.id, c.lesson_id, c.user_id, u.user_name, c.body, c.created_at FROM comments c
+		JOIN users u ON c.user_id = u.id
+		ORDER BY c.created_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var coms []comment.Comment
+	for rows.Next() {
+		var c comment.Comment
+		if err := rows.Scan(&c.ID, &c.LessonID, &c.UserID, &c.UserName, &c.Body, &c.CreatedAt); err != nil {
+			return nil, err
+		}
+		coms = append(coms, c)
+	}
+	return coms, nil
+}
