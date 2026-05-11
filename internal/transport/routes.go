@@ -40,7 +40,9 @@ func Routes(reg *http.Registration, auth *http.Authorization,
 	app.Get("/profile/stats", middleware.JWTMiddleware("secret"), ph.GetStats)
 	app.Get("/profile/favorites", middleware.JWTMiddleware("secret"), ph.GetFavorites)
 
-	adminGroup := app.Group("/api/admin", middleware.JWTMiddleware("secret"), middleware.RequireRole("admin"))
+	app.Get("/courses", adminHandler.ListCourses)
+
+	adminGroup := app.Group("/admin", middleware.JWTMiddleware("secret"), middleware.RequireRole("admin"))
 
 	adminGroup.Get("/courses", adminHandler.ListCourses)
 	adminGroup.Post("/courses", adminHandler.CreateCourse)
