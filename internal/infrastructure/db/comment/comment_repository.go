@@ -48,3 +48,11 @@ func (r *Repository) GetByLesson(ctx context.Context, lessonID int) ([]comment.C
 	}
 	return comments, nil
 }
+
+func (r *Repository) Delete(ctx context.Context, id int) error {
+	_, err := r.p.Pool.Exec(ctx, `DELETE FROM comments WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
