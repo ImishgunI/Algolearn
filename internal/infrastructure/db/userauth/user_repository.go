@@ -74,3 +74,31 @@ func (r *Repository) UpdatePassword(ctx context.Context, userID int, hash string
 	}
 	return nil
 }
+
+func (r *Repository) GetAll(ctx context.Context) ([]users.User, error) {
+	rows, err := r.p.Pool.Query(ctx, `SELECT id, user_name, user_surname, email, password_hash, user_role FROM users`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var us []users.User
+	for rows.Next() {
+		var u users.User
+		if err := rows.Scan(&u.ID, &u.Name, &u.Surname, &u.Email, &u.PasswordHash, &u.Role); err != nil {
+			return nil, err
+		}
+		us = append(us, u)
+	}
+	return us, nil
+}
+func (r *Repository) UpdateRole(ctx context.Context, userID int, role string) error {
+	_, err := r.p.Pool.Exec(ctx,
+		`UPDATE users
+		SET role = $1
+		WHERE user_id = $2`, role, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
