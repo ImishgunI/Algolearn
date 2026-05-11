@@ -11,7 +11,8 @@ import (
 
 func Routes(reg *http.Registration, auth *http.Authorization,
 	exec *http.ExecutionHandler, ls *http.LessonHandler,
-	ch *http.CommentHandler, fh *http.FavoriteHandler, ph *http.ProfileHandler) *fiber.App {
+	ch *http.CommentHandler, fh *http.FavoriteHandler, ph *http.ProfileHandler,
+	adminHandler *http.AdminHandler) *fiber.App {
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
@@ -38,5 +39,24 @@ func Routes(reg *http.Registration, auth *http.Authorization,
 	app.Put("/profile/password", middleware.JWTMiddleware("secret"), ph.UpdatePassword)
 	app.Get("/profile/stats", middleware.JWTMiddleware("secret"), ph.GetStats)
 	app.Get("/profile/favorites", middleware.JWTMiddleware("secret"), ph.GetFavorites)
+
+	adminGroup := app.Group("/api/admin", middleware.JWTMiddleware("secret"), middleware.RequireRole("admin"))
+
+	adminGroup.Get("/courses", adminHandler.ListCourses)
+	adminGroup.Post("/courses", adminHandler.CreateCourse)
+	adminGroup.Put("/courses/:id", adminHandler.UpdateCourse)
+	adminGroup.Delete("/courses/:id", adminHandler.DeleteCourse)
+
+	adminGroup.Get("/courses/:courseID/lessons", adminHandler.ListLessons)
+	adminGroup.Post("/courses/:courseID/lessons", adminHandler.CreateLesson)
+	adminGroup.Put("/lessons/:id", adminHandler.UpdateLesson)
+	adminGroup.Delete("/lessons/:id", adminHandler.DeleteLesson)
+
+	adminGroup.Get("/users", adminHandler.ListUsers)
+	adminGroup.Put("/users/:id/role", adminHandler.UpdateUserRole)
+
+	adminGroup.Delete("/comments/:id", adminHandler.DeleteComment)
+
+	adminGroup.Get("/stats", adminHandler.Stats)
 	return app
 }
