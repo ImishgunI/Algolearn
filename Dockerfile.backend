@@ -1,0 +1,27 @@
+FROM golang:1.26.0-alpine AS builder
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /build/main ./cmd/service/
+
+FROM alpine:latest
+
+WORKDIR /build
+
+RUN addgroup -S golang -g 1001 && \
+    adduser -S michael -u 1001 -G golang
+
+COPY --from=builder --chown=michael:golang /build/main /build/
+COPY --from=builder /build/main /build/
+
+USER michael
+
+EXPOSE 8000
+
+CMD ["./main"]
