@@ -5,13 +5,6 @@ import (
 	"context"
 )
 
-// type FavoriteRepository interface {
-// 	Add(ctx context.Context, userID int, lessonID int) error
-// 	Remove(ctx context.Context, userID int, lessonID int) error
-// 	IsFavorited(ctx context.Context, userID int, lessonID int) (bool, error)
-// 	GetUserFavorites(ctx context.Context, userID int) ([]int, error)
-// }
-
 type Repository struct {
 	p *sql.Postgres
 }
@@ -39,16 +32,12 @@ func (r *Repository) Remove(ctx context.Context, userID int, lessonID int) error
 }
 
 func (r *Repository) IsFavorited(ctx context.Context, userID int, lessonID int) (bool, error) {
-	var exist int
+	var exist bool
 	err := r.p.Pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM favorites WHERE user_id = $1 AND lesson_id = $2)", userID, lessonID).Scan(&exist)
 	if err != nil {
 		return false, err
 	}
-	if exist == 1 {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return exist, nil
 }
 
 func (r *Repository) GetUserFavorites(ctx context.Context, userID int) ([]int, error) {
