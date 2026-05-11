@@ -56,3 +56,12 @@ func (r *Repository) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
+
+func (r *Repository) Count(ctx context.Context) (int, error) {
+	var c int
+	err := r.p.Pool.QueryRow(ctx, `SELECT COUNT(*) FROM comments`).Scan(&c)
+	if err != nil {
+		return 0, err
+	}
+	return c, nil
+}
