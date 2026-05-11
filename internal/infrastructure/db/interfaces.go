@@ -18,6 +18,7 @@ type UserRepository interface {
 	UpdatePassword(ctx context.Context, userID int, hash string) error
 	GetAll(ctx context.Context) ([]users.User, error)
 	UpdateRole(ctx context.Context, userID int, role string) error
+	Count(ctx context.Context) (int, error)
 }
 
 type SessionRepository interface {
@@ -32,12 +33,14 @@ type LessonRepository interface {
 	Create(ctx context.Context, lesson *lesson.Lesson) error
 	Update(ctx context.Context, id int, lesson *lesson.Lesson) error
 	Delete(ctx context.Context, id int) error
+	Count(ctx context.Context) (int, error)
 }
 
 type CommentRepository interface {
 	Create(ctx context.Context, c *comment.Comment) error
 	GetByLesson(ctx context.Context, lessonID int) ([]comment.Comment, error)
 	Delete(ctx context.Context, id int) error
+	Count(ctx context.Context) (int, error)
 }
 
 type FavoriteRepository interface {
@@ -54,4 +57,5 @@ type CourseRepository interface {
 	Create(ctx context.Context, title, description string) (*course.Course, error)
 	Update(ctx context.Context, id int, title, description string) error
 	Delete(ctx context.Context, id int) error
+	Count(ctx context.Context) (int, error)
 }
