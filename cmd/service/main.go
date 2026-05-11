@@ -52,12 +52,13 @@ func main() {
 	commentHandler := http.NewCommentHandler(commentRepo, repo)
 	favRepo := favorite.NewFavoriteRepo(psql)
 	favoriteHandler := http.NewFavoriteHandler(favRepo)
+	profileHandler := http.NewProfileHandler(repo, favRepo)
 
 	worker := worker.New(storage)
 
 	go worker.Start(ctx)
 
-	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler)
+	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler, profileHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
