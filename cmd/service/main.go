@@ -14,11 +14,12 @@ import (
 	"Algolearn/internal/execution/worker"
 	"Algolearn/internal/infrastructure/cache"
 	"Algolearn/internal/infrastructure/db/comment"
+	"Algolearn/internal/infrastructure/db/course"
 	"Algolearn/internal/infrastructure/db/favorite"
 	"Algolearn/internal/infrastructure/db/lesson"
 	"Algolearn/internal/infrastructure/db/sessions"
 	"Algolearn/internal/infrastructure/db/sql"
-	"Algolearn/internal/infrastructure/db/userauth"
+	"Algolearn/internal/infrastructure/db/user"
 	"Algolearn/internal/transport"
 	"Algolearn/internal/transport/http"
 )
@@ -32,7 +33,7 @@ func main() {
 		log.Fatalf("Не удалось создать пул: %+v", err)
 	}
 	defer psql.Close()
-	repo := userauth.NewRepo(psql)
+	repo := user.NewRepo(psql)
 	session := sessions.NewSession(psql)
 
 	service := auth.NewService(repo, session)
@@ -53,12 +54,14 @@ func main() {
 	favRepo := favorite.NewFavoriteRepo(psql)
 	favoriteHandler := http.NewFavoriteHandler(favRepo)
 	profileHandler := http.NewProfileHandler(repo, favRepo)
+	couresRepo := course.NewCourseRepository(psql)
+	adminHandler := http.NewAdminHandler(couresRepo, lessonRepo, repo, commentRepo)
 
 	worker := worker.New(storage)
 
 	go worker.Start(ctx)
 
-	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler, profileHandler)
+	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler, profileHandler, adminHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
