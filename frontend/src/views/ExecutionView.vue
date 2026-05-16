@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from "vue";
+import { ref, computed, onUnmounted, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { executeAlgorithm, getExecution } from "../api/execution";
+import { http } from "../api/http";
 import CodeBlock from "../components/CodeBlock.vue";
 import BubbleSortVisualizer from "../components/visualizers/BubbleSortVisualizer.vue";
 import QuickSortVisualizer from "../components/visualizers/QuickSortVisualizer.vue";
 import MergeSortVisualizer from "../components/visualizers/MergeSortVisualizer.vue";
 import { algorithmRegistry } from "../algorithmCodes";
 import type { SortStep, GraphStep, Step } from "../types/execution"
+import CodeEditor from "../components/CodeEditor.vue";
 
 const input = ref("5, 3, 1, 8, 4, 2, 7");
 const steps = ref<Step[]>([]);
@@ -16,7 +19,31 @@ const speed = ref(600);
 const isLoading = ref(false);
 const selectedAlgorithm = ref("bubble_sort");
 
-const algorithmMeta = computed(() => algorithmRegistry[selectedAlgorithm.value]);
+const customCode = ref(`func Run(input []int) []Step {
+  // Пример: пузырьковая сортировка
+  var steps []Step
+  n := len(input)
+  arr := make([]int, n)
+  copy(arr, input)
+  for i := 0; i < n-1; i++ {
+    for j := 0; j < n-i-1; j++ {
+      steps = append(steps, Step{Array: append([]int(nil), arr...), Active: []int{j, j+1}})
+      if arr[j] > arr[j+1] {
+        arr[j], arr[j+1] = arr[j+1], arr[j]
+        steps = append(steps, Step{Array: append([]int(nil), arr...), Swapping: []int{j, j+1}})
+      }
+    }
+  }
+  return steps
+}`);
+
+const algorithmMeta = computed(() => {
+  if (selectedAlgorithm.value === "custom") {
+    return { type: "sort", displayName: "Свой код (Go)", code: [] };
+  }
+  return algorithmRegistry[selectedAlgorithm.value] || { type: "sort", displayName: selectedAlgorithm.value, code: [] };
+});
+
 const algorithmType = computed(() => algorithmMeta.value?.type || "other");
 const currentCode = computed(() => algorithmMeta.value?.code || []);
 const currentStepLines = computed(() => {
@@ -27,42 +54,58 @@ const currentStepLines = computed(() => {
 // ---------- Анимация ----------
 let interval: number | null = null;
 
+async function runPredefinedAlgorithm() {
+  const numbers = input.value.split(",").map(n => Number(n.trim()));
+  const response = await executeAlgorithm(selectedAlgorithm.value, numbers);
+  const ans = await getExecution(response.execution_id);
+  const rawSteps = ans.steps || [];
+  if (algorithmType.value === "sort") {
+    steps.value = rawSteps.map((step: any): SortStep => ({
+      type: "sort",
+      bars: step.array.map((value: number, index: number) => ({ value, id: index })),
+      active: step.active || [],
+      swapping: step.swapping || [],
+      lines: step.lines || [],
+    }));
+  } else if (algorithmType.value === "graph") {
+    steps.value = rawSteps.map((step: any): GraphStep => ({
+      type: "graph",
+      graph: step.graph || { nodes: [], edges: [] },
+      activeNodes: step.activeNodes || [],
+      visitedNodes: step.visitedNodes || [],
+      lines: step.lines || [],
+    }));
+  } else {
+    steps.value = [];
+  }
+}
+
+async function runCustomAlgorithm() {
+  const numbers = input.value.split(",").map(n => Number(n.trim()));
+  const response = await http("/api/execute-custom", {
+    method: "POST",
+    body: JSON.stringify({ code: customCode.value, input: numbers }),
+  });
+  const rawSteps = response.steps || [];
+  steps.value = rawSteps.map((step: any): SortStep => ({
+    type: "sort",
+    bars: step.array.map((value: number, idx: number) => ({ value, id: idx })),
+    active: step.active || [],
+    swapping: step.swapping || [],
+    lines: step.lines || [],
+  }));
+}
+
 async function runAlgorithm() {
   isLoading.value = true;
   steps.value = [];
   currentStep.value = 0;
-
   try {
-    const numbers = input.value.split(",").map(n => Number(n.trim()));
-    console.log(selectedAlgorithm.value)
-    const response = await executeAlgorithm(selectedAlgorithm.value, numbers);
-    const ans = await getExecution(response.execution_id);
-
-    const rawSteps = ans.steps || [];
-
-    if (algorithmType.value === "sort") {
-      steps.value = rawSteps.map((step: any): SortStep => ({
-        type: "sort",
-        bars: step.array.map((value: number, index: number) => ({
-          value,
-          id: index,
-        })),
-        active: step.active || [],
-        swapping: step.swapping || [],
-        lines: step.lines || [],
-      }));
-    } else if (algorithmType.value === "graph") {
-      steps.value = rawSteps.map((step: any): GraphStep => ({
-        type: "graph",
-        graph: step.graph || { nodes: [], edges: [] },
-        activeNodes: step.activeNodes || [],
-        visitedNodes: step.visitedNodes || [],
-        lines: step.lines || [],
-      }));
+    if (selectedAlgorithm.value === "custom") {
+      await runCustomAlgorithm();
     } else {
-      steps.value = [];
+      await runPredefinedAlgorithm();
     }
-
     currentStep.value = 0;
   } catch (err) {
     alert("Ошибка при запуске алгоритма");
@@ -95,24 +138,34 @@ function reset() {
 }
 
 onUnmounted(() => pause());
+
+// Приём параметров из URL
+const route = useRoute();
+onMounted(() => {
+  const algo = route.query.algorithm as string;
+  const inp = route.query.input as string;
+  if (algo) selectedAlgorithm.value = algo;
+  if (inp) input.value = inp;
+});
 </script>
 
 <template>
   <div class="visualizer-page">
     <div class="header">
       <h1>⚡ Визуализатор алгоритмов</h1>
-      <p class="subtitle">Введи числа через запятую и наблюдай за магией</p>
+      <p class="subtitle">Выберите алгоритм или напишите свой код на Go</p>
     </div>
 
     <!-- Панель управления -->
     <div class="controls-panel glass">
       <select v-model="selectedAlgorithm" class="algo-select">
-        <option v-for="(_, key) in algorithmRegistry" :key="key" :value="key">
-          {{ algorithmRegistry[key].displayName || key }}
+        <option v-for="(meta, key) in algorithmRegistry" :key="key" :value="key">
+          {{ meta.displayName || key }}
         </option>
+        <option value="custom">Свой код (Go)</option>
       </select>
 
-      <div class="input-group" v-if="algorithmType === 'sort'">
+      <div class="input-group" v-if="algorithmType === 'sort' || selectedAlgorithm === 'custom'">
         <div class="input-wrapper">
           <span class="input-icon">🔢</span>
           <input v-model="input" placeholder="5, 3, 1, 8, 4, 2, 7" @keyup.enter="runAlgorithm" />
@@ -137,9 +190,18 @@ onUnmounted(() => pause());
       </div>
     </div>
 
-      <!-- Визуализация -->
+    <!-- Редактор для своего кода -->
+    <div v-if="selectedAlgorithm === 'custom'" class="custom-code-section glass">
+      <h3>Ваш алгоритм на Go</h3>
+      <p class="hint">
+        Определите функцию <code>Run(input []int) []Step</code>, где Step — структура с полями Array, Active, Swapping.
+      </p>
+      <CodeEditor v-model="customCode" />
+    </div>
+
+    <!-- Визуализация -->
     <BubbleSortVisualizer
-      v-if="selectedAlgorithm === 'bubble_sort'"
+      v-if="selectedAlgorithm === 'bubble_sort' || selectedAlgorithm === 'custom'"
       :steps="(steps as SortStep[])"
       :currentStep="currentStep"
     />
@@ -156,19 +218,15 @@ onUnmounted(() => pause());
       :currentStep="currentStep"
     />
 
-    <!-- <GraphVisualizer
-      v-else-if="algorithmType === 'graph' && currentStepData?.type === 'graph'"
-      :steps="(steps as GraphStep[])"
-      :currentStep="currentStep"
-    /> -->
+    <!-- <GraphVisualizer ... /> -->
 
-    <!-- Блок кода -->
+    <!-- Блок кода для встроенных алгоритмов -->
     <div v-if="currentCode.length" class="code-section">
       <h3>Исходный код</h3>
       <CodeBlock :codeLines="currentCode" :activeLines="currentStepLines" />
     </div>
 
-      <!-- Управление плеером -->
+    <!-- Управление плеером -->
     <div class="playback-controls">
       <button @click="reset" class="btn btn-secondary">↺ Сброс</button>
       <button @click="isPlaying ? pause() : play()" class="btn btn-primary play-btn">
@@ -363,6 +421,21 @@ onUnmounted(() => pause());
 .code-section h3 {
   margin: 0 0 12px;
   font-size: 1.1rem;
+}
+
+.custom-code-section {
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.hint code {
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }

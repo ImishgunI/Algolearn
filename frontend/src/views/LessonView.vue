@@ -4,6 +4,8 @@ import { useRoute } from "vue-router";
 import { getLesson, type Lesson } from "../api/lessons";
 import { getComments, createComment, getFavoriteStatus, toggleFavorite } from "../api/lessons";
 import { user } from "../store/user";
+import CodeBlock from "../components/CodeBlock.vue";
+import { algorithmRegistry } from "../algorithmCodes";
 
 const route = useRoute();
 const lessonId = computed(() => {
@@ -15,6 +17,13 @@ const lesson = ref<Lesson | null>(null);
 const comments = ref<any[]>([]);
 const isFavorited = ref(false);
 const newComment = ref("");
+
+
+const currentCode = computed(() => {
+  if (!lesson.value?.algorithm_type) return [];
+  const meta = algorithmRegistry[lesson.value.algorithm_type];
+  return meta?.code || [];
+});
 
 async function loadLessonData(id: number) {
   try {
@@ -67,6 +76,11 @@ async function handleToggleFavorite() {
     <h1>{{ lesson.title }}</h1>
     <div class="text-content" v-html="lesson.theory.replace(/\n/g, '<br/>')" />
 
+    <div v-if="currentCode.length" class="code-section">
+      <h3>Пример кода</h3>
+      <CodeBlock :codeLines="currentCode" :activeLines="[]" />
+    </div>
+
     <div v-if="lesson.algorithm_type" class="action-section">
       <router-link
         :to="`/visualize?algorithm=${lesson.algorithm_type}&input=5,3,1,8,4,2,7`"
@@ -97,6 +111,9 @@ async function handleToggleFavorite() {
 </template>
 
 <style scoped>
+.text-content { margin: 24px 0; line-height: 1.8; font-size: 1.05rem; }
+.code-section { margin: 24px 0; }
+.action-section { margin-top: 32px; display: flex; gap: 12px; align-items: center; }
 .comments-section { margin-top: 40px; }
 .comment-form { margin-bottom: 20px; }
 textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }

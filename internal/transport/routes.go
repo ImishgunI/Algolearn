@@ -12,7 +12,7 @@ import (
 func Routes(reg *http.Registration, auth *http.Authorization,
 	exec *http.ExecutionHandler, ls *http.LessonHandler,
 	ch *http.CommentHandler, fh *http.FavoriteHandler, ph *http.ProfileHandler,
-	adminHandler *http.AdminHandler) *fiber.App {
+	adminHandler *http.AdminHandler, custom *http.CustomExecutionHandler) *fiber.App {
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
@@ -24,6 +24,7 @@ func Routes(reg *http.Registration, auth *http.Authorization,
 
 	app.Post("/execute", exec.Execute)
 	app.Get("/execution/:id", exec.Get)
+	app.Post("/execute-custom", middleware.JWTMiddleware("secret"), custom.Execute)
 
 	app.Get("/courses/:courseID/lessons", ls.GetByCourse)
 	app.Get("/lessons/:id", ls.GetByID)

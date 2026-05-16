@@ -56,12 +56,12 @@ func main() {
 	profileHandler := http.NewProfileHandler(repo, favRepo)
 	couresRepo := course.NewCourseRepository(psql)
 	adminHandler := http.NewAdminHandler(couresRepo, lessonRepo, repo, commentRepo)
-
+	customExecHandler := http.NewCustomExecutionHandler()
 	worker := worker.New(storage)
 
 	go worker.Start(ctx)
 
-	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler, profileHandler, adminHandler)
+	app := transport.Routes(regHandler, authHandler, execHandler, lessonHandler, commentHandler, favoriteHandler, profileHandler, adminHandler, customExecHandler)
 
 	go func() {
 		if err := app.Listen(":8000"); err != nil {
