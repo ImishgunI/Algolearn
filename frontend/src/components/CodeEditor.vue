@@ -3,7 +3,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap } from "@codemirror/commands";
-import { oneDark } from '@codemirror/theme-one-dark';
+import { eclipse } from '@uiw/codemirror-theme-eclipse';
 import { go } from '@codemirror/lang-go';
 
 const props = defineProps<{
@@ -33,7 +33,7 @@ onMounted(() => {
       lineNumbers(),
       highlightActiveLine(),
       keymap.of(defaultKeymap),
-      oneDark,
+      eclipse,
       updateListener,
     ],
   });
